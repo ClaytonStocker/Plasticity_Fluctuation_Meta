@@ -10,13 +10,13 @@ pacman::p_load(tidyverse, readxl, gtsummary, dplyr,
                robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra)
 
 # Importing Data Set
-data <- read.csv("./3.Data_Analysis/2.Outputs/Data/Complex_Final_Data.csv")
+data <- read.csv("./Complex_Final_Data.csv")
 data$obs <- 1:nrow(data)
 data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
 data$phylo <- data$Scientific_Name
 
 # Phylogenetic covariance matrix
-tree <- ape::read.tree("./3.Data_Analysis/2.Outputs/Phylogeny/Complex_tree")
+tree <- ape::read.tree("./Complex_tree")
 phy <- ape::compute.brlen(tree, method = "Grafen", power = 1)
 A <- ape::vcv.phylo(phy)
 row.names(A) <- colnames(A) <- row.names(A)
@@ -34,9 +34,9 @@ system.time( #  1ish minutes
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                      control=list(rel.tol=1e-9))
-    saveRDS(Overall_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Overall_Model.rds")
+    saveRDS(Overall_Model, "./Complex_Overall_Model.rds")
   } else {
-    Overall_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Overall_Model.rds")})
+    Overall_Model <- readRDS("./Complex_Overall_Model.rds")})
 
 Overall_Model_rob <- robust(Overall_Model, cluster = data$Study_ID, adjust = TRUE)
 
@@ -54,9 +54,9 @@ system.time( #  1ish minutes
                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
                                        R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                        control=list(rel.tol=1e-9))
-    saveRDS(Amplitude_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Amplitude_Model.rds")
+    saveRDS(Amplitude_Model, "./Complex_Amplitude_Model.rds")
   } else {
-    Amplitude_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Amplitude_Model.rds")})
+    Amplitude_Model <- readRDS("./Complex_Amplitude_Model.rds")})
 
 Amplitude_Model_rob <- robust(Amplitude_Model, cluster = data$Study_ID, adjust = TRUE)
 
@@ -125,9 +125,9 @@ system.time( #  1ish minutes
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Fluctuation_A_cor), data = Fluctuation_Data, method = "REML", sparse = TRUE, 
                                          control=list(rel.tol=1e-9))
-    saveRDS(Fluctuation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Fluctuation_Model.rds")
+    saveRDS(Fluctuation_Model, "./Complex_Fluctuation_Model.rds")
   } else {
-    Fluctuation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Fluctuation_Model.rds")})
+    Fluctuation_Model <- readRDS("./Complex_Fluctuation_Model.rds")})
 
 Fluctuation_Model_rob <- robust(Fluctuation_Model, cluster = Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -407,9 +407,9 @@ system.time( #  1ish minutes
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                    R = list(phylo=Trait_A_cor), data = Trait_Data, method = "REML", sparse = TRUE, 
                                    control=list(rel.tol=1e-9))
-    saveRDS(Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Trait_Model.rds")
+    saveRDS(Trait_Model, "./Complex_Trait_Model.rds")
   } else {
-    Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Trait_Model.rds")})
+    Trait_Model <- readRDS("./Complex_Trait_Model.rds")})
 
 Trait_Model_rob <- robust(Trait_Model, cluster = Trait_Data$Study_ID, adjust = TRUE)
 
@@ -711,9 +711,9 @@ system.time( #  1ish minutes
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                    R = list(phylo=Class_A_cor), data = Class_Data, method = "REML", sparse = TRUE, 
                                    control=list(rel.tol=1e-9))
-    saveRDS(Class_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Class_Model.rds")
+    saveRDS(Class_Model, "./Complex_Class_Model.rds")
   } else {
-    Class_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Class_Model.rds")})
+    Class_Model <- readRDS("./Complex_Class_Model.rds")})
 
 Class_Model_rob <- robust(Class_Model, cluster = Class_Data$Study_ID, adjust = TRUE)
 
@@ -994,9 +994,9 @@ system.time( #  1ish minutes
                                                           ~1|Shared_Animal_Number), 
                                             R = list(phylo=Specific_Trait_A_cor), data = Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                             control=list(rel.tol=1e-9))
-    saveRDS(Specific_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Specific_Trait_Model.rds")
+    saveRDS(Specific_Trait_Model, "./Complex_Specific_Trait_Model.rds")
   } else {
-    Specific_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Specific_Trait_Model.rds")})
+    Specific_Trait_Model <- readRDS("./Complex_Specific_Trait_Model.rds")})
 
 Specific_Trait_Model_rob <- robust(Specific_Trait_Model, cluster = Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -1280,9 +1280,9 @@ system.time( #  1ish minutes
                                                       ~1|Shared_Animal_Number, ~1|Measurement), 
                                         R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE,
                                         control=list(rel.tol=1e-9))
-    saveRDS(Individual_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Model.rds")
+    saveRDS(Individual_Model, "./Complex_Individual_Model.rds")
   } else {
-    Individual_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Model.rds")})
+    Individual_Model <- readRDS("./Complex_Individual_Model.rds")})
 
 Individual_Model_rob <- robust(Individual_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1299,9 +1299,9 @@ system.time( #  1ish minutes
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
                                                   R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE, 
                                                   control=list(rel.tol=1e-9))
-    saveRDS(Individual_Amplitude_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Amplitude_Model.rds")
+    saveRDS(Individual_Amplitude_Model, "./Complex_Individual_Amplitude_Model.rds")
   } else {
-    Individual_Amplitude_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Amplitude_Model.rds")})
+    Individual_Amplitude_Model <- readRDS("./Complex_Individual_Amplitude_Model.rds")})
 
 Individual_Amplitude_Model_rob <- robust(Individual_Amplitude_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1372,9 +1372,9 @@ system.time( #  1ish minutes
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
                                                     R = list(phylo=Individual_Fluctuation_A_cor), data = Individual_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                     control=list(rel.tol=1e-9))
-    saveRDS(Individual_Fluctuation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Fluctuation_Model.rds")
+    saveRDS(Individual_Fluctuation_Model, "./Complex_Individual_Fluctuation_Model.rds")
   } else {
-    Individual_Fluctuation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Fluctuation_Model.rds")})
+    Individual_Fluctuation_Model <- readRDS("./Complex_Individual_Fluctuation_Model.rds")})
 
 Individual_Fluctuation_Model_rob <- robust(Individual_Fluctuation_Model, cluster = Individual_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -1654,9 +1654,9 @@ system.time( #  1ish minutes
                                                             ~1|Shared_Animal_Number, ~1|Measurement), 
                                               R = list(phylo=Individual_Class_A_cor), data = Individual_Class_Data, method = "REML", sparse = TRUE, 
                                               control=list(rel.tol=1e-9))
-    saveRDS(Individual_Class_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Class_Model.rds")
+    saveRDS(Individual_Class_Model, "./Complex_Individual_Class_Model.rds")
   } else {
-    Individual_Class_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Individual_Class_Model.rds")})
+    Individual_Class_Model <- readRDS("./Complex_Individual_Class_Model.rds")})
 
 Individual_Class_Model_rob <- robust(Individual_Class_Model, cluster = Individual_Class_Data$Study_ID, adjust = TRUE)
 
@@ -1901,9 +1901,9 @@ system.time( #  1ish minutes
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
                                      control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Model.rds")
+    saveRDS(Aquatic_Model, "./Complex_Aquatic_Model.rds")
   } else {
-    Aquatic_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Model.rds")})
+    Aquatic_Model <- readRDS("./Complex_Aquatic_Model.rds")})
 
 Aquatic_Model_rob <- robust(Aquatic_Model, cluster = Aquatic_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1920,9 +1920,9 @@ system.time( #  1ish minutes
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Amplitude_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Amplitude_Model.rds")
+    saveRDS(Aquatic_Amplitude_Model, "./Complex_Aquatic_Amplitude_Model.rds")
   } else {
-    Aquatic_Amplitude_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Amplitude_Model.rds")})
+    Aquatic_Amplitude_Model <- readRDS("./Complex_Aquatic_Amplitude_Model.rds")})
 
 Aquatic_Amplitude_Model_rob <- robust(Aquatic_Amplitude_Model, cluster = Aquatic_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1994,9 +1994,9 @@ system.time( #  1ish minutes
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
                                                  R = list(phylo=Aquatic_Fluctuation_A_cor), data = Aquatic_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                  control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Fluctuation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Fluctuation_Model.rds")
+    saveRDS(Aquatic_Fluctuation_Model, "./Complex_Aquatic_Fluctuation_Model.rds")
   } else {
-    Aquatic_Fluctuation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Fluctuation_Model.rds")})
+    Aquatic_Fluctuation_Model <- readRDS("./Complex_Aquatic_Fluctuation_Model.rds")})
 
 Aquatic_Fluctuation_Model_rob <- robust(Aquatic_Fluctuation_Model, cluster = Aquatic_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -2259,9 +2259,9 @@ system.time( #  1ish minutes
                                                          ~1|Shared_Animal_Number, ~1|Measurement), 
                                            R = list(phylo=Aquatic_Trait_A_cor), data = Aquatic_Trait_Data, method = "REML", sparse = TRUE, 
                                            control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Trait_Model.rds")
+    saveRDS(Aquatic_Trait_Model, "./Complex_Aquatic_Trait_Model.rds")
   } else {
-    Aquatic_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Trait_Model.rds")})
+    Aquatic_Trait_Model <- readRDS("./Complex_Aquatic_Trait_Model.rds")})
 
 Aquatic_Trait_Model_rob <- robust(Aquatic_Trait_Model, cluster = Aquatic_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -2509,9 +2509,9 @@ system.time( #  1ish minutes
                                                               ~1|Shared_Animal_Number, ~1|Measurement), 
                                                 R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
                                                 control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Plasticity_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Plasticity_Model.rds")
+    saveRDS(Aquatic_Plasticity_Model, "./Complex_Aquatic_Plasticity_Model.rds")
   } else {
-    Aquatic_Plasticity_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Aquatic_Plasticity_Model.rds")})
+    Aquatic_Plasticity_Model <- readRDS("./Complex_Aquatic_Plasticity_Model.rds")})
 
 Aquatic_Plasticity_Model_rob <- robust(Aquatic_Plasticity_Model, cluster = Aquatic_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2756,9 +2756,9 @@ system.time( #  1ish minutes
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                          control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Model.rds")
+    saveRDS(Terrestrial_Model, "./Complex_Terrestrial_Model.rds")
   } else {
-    Terrestrial_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Model.rds")})
+    Terrestrial_Model <- readRDS("./Complex_Terrestrial_Model.rds")})
 
 Terrestrial_Model_rob <- robust(Terrestrial_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2775,9 +2775,9 @@ system.time( #  1ish minutes
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Amplitude_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Amplitude_Model.rds")
+    saveRDS(Terrestrial_Amplitude_Model, "./Complex_Terrestrial_Amplitude_Model.rds")
   } else {
-    Terrestrial_Amplitude_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Amplitude_Model.rds")})
+    Terrestrial_Amplitude_Model <- readRDS("./Complex_Terrestrial_Amplitude_Model.rds")})
 
 Terrestrial_Amplitude_Model_rob <- robust(Terrestrial_Amplitude_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2848,9 +2848,9 @@ system.time( #  1ish minutes
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                                      R = list(phylo=Terrestrial_Fluctuation_A_cor), data = Terrestrial_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                      control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Fluctuation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Fluctuation_Model.rds")
+    saveRDS(Terrestrial_Fluctuation_Model, "./Complex_Terrestrial_Fluctuation_Model.rds")
   } else {
-    Terrestrial_Fluctuation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Fluctuation_Model.rds")})
+    Terrestrial_Fluctuation_Model <- readRDS("./Complex_Terrestrial_Fluctuation_Model.rds")})
 
 Terrestrial_Fluctuation_Model_rob <- robust(Terrestrial_Fluctuation_Model, cluster = Terrestrial_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -3129,9 +3129,9 @@ system.time( #  1ish minutes
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Terrestrial_Trait_A_cor), data = Terrestrial_Trait_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Trait_Model.rds")
+    saveRDS(Terrestrial_Trait_Model, "./Complex_Terrestrial_Trait_Model.rds")
   } else {
-    Terrestrial_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Trait_Model.rds")})
+    Terrestrial_Trait_Model <- readRDS("./Complex_Terrestrial_Trait_Model.rds")})
 
 Terrestrial_Trait_Model_rob <- robust(Terrestrial_Trait_Model, cluster = Terrestrial_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -3415,9 +3415,9 @@ system.time( #  1ish minutes
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
                                                     R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                                     control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Plasticity_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Plasticity_Model.rds")
+    saveRDS(Terrestrial_Plasticity_Model, "./Complex_Terrestrial_Plasticity_Model.rds")
   } else {
-    Terrestrial_Plasticity_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Plasticity_Model.rds")})
+    Terrestrial_Plasticity_Model <- readRDS("./Complex_Terrestrial_Plasticity_Model.rds")})
 
 Terrestrial_Plasticity_Model_rob <- robust(Terrestrial_Plasticity_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -3678,9 +3678,9 @@ system.time( #  1ish minutes
                                                                       ~1|Shared_Animal_Number), 
                                                         R = list(phylo=Terrestrial_Specific_Trait_A_cor), data = Terrestrial_Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                                         control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Specific_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Specific_Trait_Model.rds")
+    saveRDS(Terrestrial_Specific_Trait_Model, "./Complex_Terrestrial_Specific_Trait_Model.rds")
   } else {
-    Terrestrial_Specific_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Terrestrial_Specific_Trait_Model.rds")})
+    Terrestrial_Specific_Trait_Model <- readRDS("./Complex_Terrestrial_Specific_Trait_Model.rds")})
 
 Terrestrial_Specific_Trait_Model_rob <- robust(Terrestrial_Specific_Trait_Model, cluster = Terrestrial_Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -3943,9 +3943,9 @@ system.time( #  1ish minutes
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
                                          control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Model.rds")
+    saveRDS(Acclimation_Model, "./Complex_Acclimation_Model.rds")
   } else {
-    Acclimation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Model.rds")})
+    Acclimation_Model <- readRDS("./Complex_Acclimation_Model.rds")})
 
 Acclimation_Model_rob <- robust(Acclimation_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -3962,9 +3962,9 @@ system.time( #  1ish minutes
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Amplitude_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Amplitude_Model.rds")
+    saveRDS(Acclimation_Amplitude_Model, "./Complex_Acclimation_Amplitude_Model.rds")
   } else {
-    Acclimation_Amplitude_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Amplitude_Model.rds")})
+    Acclimation_Amplitude_Model <- readRDS("./Complex_Acclimation_Amplitude_Model.rds")})
 
 Acclimation_Amplitude_Model_rob <- robust(Acclimation_Amplitude_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -4012,9 +4012,9 @@ system.time( #  1ish minutes
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
                                                   R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
                                                   control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Exposure_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Exposure_Model.rds")
+    saveRDS(Acclimation_Exposure_Model, "./Complex_Acclimation_Exposure_Model.rds")
   } else {
-    Acclimation_Exposure_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Exposure_Model.rds")})
+    Acclimation_Exposure_Model <- readRDS("./Complex_Acclimation_Exposure_Model.rds")})
 
 Acclimation_Exposure_Model_rob <- robust(Acclimation_Exposure_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -4071,9 +4071,9 @@ system.time( #  1ish minutes
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Acclimation_Frequency_A_cor), data = Acclimation_Frequency_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Frequency_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Frequency_Model.rds")
+    saveRDS(Acclimation_Frequency_Model, "./Complex_Acclimation_Frequency_Model.rds")
   } else {
-    Acclimation_Frequency_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Frequency_Model.rds")})
+    Acclimation_Frequency_Model <- readRDS("./Complex_Acclimation_Frequency_Model.rds")})
 
 Acclimation_Frequency_Model_rob <- robust(Acclimation_Frequency_Model, cluster = Acclimation_Frequency_Data$Study_ID, adjust = TRUE)
 
@@ -4145,9 +4145,9 @@ system.time( #  1ish minutes
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                                      R = list(phylo=Acclimation_Fluctuation_A_cor), data = Acclimation_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                      control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Fluctuation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Fluctuation_Model.rds")
+    saveRDS(Acclimation_Fluctuation_Model, "./Complex_Acclimation_Fluctuation_Model.rds")
   } else {
-    Acclimation_Fluctuation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Fluctuation_Model.rds")})
+    Acclimation_Fluctuation_Model <- readRDS("./Complex_Acclimation_Fluctuation_Model.rds")})
 
 Acclimation_Fluctuation_Model_rob <- robust(Acclimation_Fluctuation_Model, cluster = Acclimation_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -4409,9 +4409,9 @@ system.time( #  1ish minutes
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Acclimation_Trait_A_cor), data = Acclimation_Trait_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Trait_Model.rds")
+    saveRDS(Acclimation_Trait_Model, "./Complex_Acclimation_Trait_Model.rds")
   } else {
-    Acclimation_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Trait_Model.rds")})
+    Acclimation_Trait_Model <- readRDS("./Complex_Acclimation_Trait_Model.rds")})
 
 Acclimation_Trait_Model_rob <- robust(Acclimation_Trait_Model, cluster = Acclimation_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -4498,7 +4498,7 @@ density_acclimation_trait <- acclimation_trait_table %>% mutate(name = fct_relev
 
 density_acclimation_trait #(400x240)
 
-# Preparing Graph
+# Preparing Graph - Part 1
 
 acclimation_trait_rnames_1 <- c("Biochemical Assay")
 
@@ -4529,7 +4529,7 @@ acclimation_trait_raw_name_1 <- c(replicate(27, "Biochemical Assay"))
 acclimation_trait_raw_df_1 <- data.frame("Model" = acclimation_trait_raw_name_1, 
                                          "Effect" = acclimation_trait_raw_mean_1)
 
-# Graph code
+# Graph code - Part 1
 
 Acclimation_Trait_Order_1 <- c("Biochemical Assay")
 
@@ -4568,7 +4568,7 @@ density_acclimation_trait_1 <- acclimation_trait_table_1 %>% mutate(name = fct_r
 
 density_acclimation_trait_1 #(400x160)
 
-# Preparing Graph
+# Preparing Graph - Part 2
 
 acclimation_trait_rnames_2 <- c("Physiological")
 
@@ -4599,7 +4599,7 @@ acclimation_trait_raw_name_2 <- c(replicate(32, "Physiological"))
 acclimation_trait_raw_df_2 <- data.frame("Model" = acclimation_trait_raw_name_2, 
                                          "Effect" = acclimation_trait_raw_mean_2)
 
-# Graph code
+# Graph code - Part 2
 
 Acclimation_Trait_Order_2 <- c("Physiological")
 
@@ -4669,9 +4669,9 @@ system.time( #  1ish minutes
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Acclimation_Stage_A_cor), data = Acclimation_Stage_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Stage_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Stage_Model.rds")
+    saveRDS(Acclimation_Stage_Model, "./Complex_Acclimation_Stage_Model.rds")
   } else {
-    Acclimation_Stage_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Stage_Model.rds")})
+    Acclimation_Stage_Model <- readRDS("./Complex_Acclimation_Stage_Model.rds")})
 
 Acclimation_Stage_Model_rob <- robust(Acclimation_Stage_Model, cluster = Acclimation_Stage_Data$Study_ID, adjust = TRUE)
 
@@ -4949,9 +4949,9 @@ system.time( #  1ish minutes
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Acclimation_Class_A_cor), data = Acclimation_Class_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Class_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Class_Model.rds")
+    saveRDS(Acclimation_Class_Model, "./Complex_Acclimation_Class_Model.rds")
   } else {
-    Acclimation_Class_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Class_Model.rds")})
+    Acclimation_Class_Model <- readRDS("./Complex_Acclimation_Class_Model.rds")})
 
 Acclimation_Class_Model_rob <- robust(Acclimation_Class_Model, cluster = Acclimation_Class_Data$Study_ID, adjust = TRUE)
 
@@ -5061,9 +5061,9 @@ system.time( #  1ish minutes
                                                                       ~1|Shared_Animal_Number), 
                                                         R = list(phylo=Acclimation_Specific_Trait_A_cor), data = Acclimation_Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                                         control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Specific_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Specific_Trait_Model.rds")
+    saveRDS(Acclimation_Specific_Trait_Model, "./Complex_Acclimation_Specific_Trait_Model.rds")
   } else {
-    Acclimation_Specific_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Acclimation_Specific_Trait_Model.rds")})
+    Acclimation_Specific_Trait_Model <- readRDS("./Complex_Acclimation_Specific_Trait_Model.rds")})
 
 Acclimation_Specific_Trait_Model_rob <- robust(Acclimation_Specific_Trait_Model, cluster = Acclimation_Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -5159,9 +5159,9 @@ system.time( #  1ish minutes
                                                          ~1|Shared_Animal_Number, ~1|Measurement), 
                                            R = list(phylo=Developmental_A_cor), data = Developmental_Subset_Data, method = "REML", sparse = TRUE, 
                                            control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Model.rds")
+    saveRDS(Developmental_Model, "./Complex_Developmental_Model.rds")
   } else {
-    Developmental_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Model.rds")})
+    Developmental_Model <- readRDS("./Complex_Developmental_Model.rds")})
 
 Developmental_Model_rob <- robust(Developmental_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -5178,9 +5178,9 @@ system.time( #  1ish minutes
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                                      R = list(phylo=Developmental_A_cor), data = Developmental_Subset_Data, method = "REML", sparse = TRUE, 
                                                      control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Amplitude_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Amplitude_Model.rds")
+    saveRDS(Developmental_Amplitude_Model, "./Complex_Developmental_Amplitude_Model.rds")
   } else {
-    Developmental_Amplitude_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Amplitude_Model.rds")})
+    Developmental_Amplitude_Model <- readRDS("./Complex_Developmental_Amplitude_Model.rds")})
 
 Developmental_Amplitude_Model_rob <- robust(Developmental_Amplitude_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -5250,9 +5250,9 @@ system.time( #  1ish minutes
                                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
                                                        R = list(phylo=Developmental_Fluctuation_A_cor), data = Developmental_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                        control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Fluctuation_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Fluctuation_Model.rds")
+    saveRDS(Developmental_Fluctuation_Model, "./Complex_Developmental_Fluctuation_Model.rds")
   } else {
-    Developmental_Fluctuation_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Fluctuation_Model.rds")})
+    Developmental_Fluctuation_Model <- readRDS("./Complex_Developmental_Fluctuation_Model.rds")})
 
 Developmental_Fluctuation_Model_rob <- robust(Developmental_Fluctuation_Model, cluster = Developmental_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -5533,9 +5533,9 @@ system.time( #  1ish minutes
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
                                                  R = list(phylo=Developmental_Trait_A_cor), data = Developmental_Trait_Data, method = "REML", sparse = TRUE, 
                                                  control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Trait_Model.rds")
+    saveRDS(Developmental_Trait_Model, "./Complex_Developmental_Trait_Model.rds")
   } else {
-    Developmental_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Trait_Model.rds")})
+    Developmental_Trait_Model <- readRDS("./Complex_Developmental_Trait_Model.rds")})
 
 Developmental_Trait_Model_rob <- robust(Developmental_Trait_Model, cluster = Developmental_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -5784,9 +5784,9 @@ system.time( #  1ish minutes
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
                                                     R = list(phylo=Developmental_A_cor), data = Developmental_Subset_Data, method = "REML", sparse = TRUE, 
                                                     control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Exposure_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Exposure_Model.rds")
+    saveRDS(Developmental_Exposure_Model, "./Complex_Developmental_Exposure_Model.rds")
   } else {
-    Developmental_Exposure_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Exposure_Model.rds")})
+    Developmental_Exposure_Model <- readRDS("./Complex_Developmental_Exposure_Model.rds")})
 
 Developmental_Exposure_Model_rob <- robust(Developmental_Exposure_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -6065,9 +6065,9 @@ system.time( #  1ish minutes
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
                                                  R = list(phylo=Developmental_Class_A_cor), data = Developmental_Class_Data, method = "REML", sparse = TRUE, 
                                                  control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Class_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Class_Model.rds")
+    saveRDS(Developmental_Class_Model, "./Complex_Developmental_Class_Model.rds")
   } else {
-    Developmental_Class_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Class_Model.rds")})
+    Developmental_Class_Model <- readRDS("./Complex_Developmental_Class_Model.rds")})
 
 Developmental_Class_Model_rob <- robust(Developmental_Class_Model, cluster = Developmental_Class_Data$Study_ID, adjust = TRUE)
 
@@ -6329,9 +6329,9 @@ system.time( #  1ish minutes
                                                                         ~1|Shared_Animal_Number), 
                                                           R = list(phylo=Developmental_Specific_Trait_A_cor), data = Developmental_Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                                           control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Specific_Trait_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Specific_Trait_Model.rds")
+    saveRDS(Developmental_Specific_Trait_Model, "./Complex_Developmental_Specific_Trait_Model.rds")
   } else {
-    Developmental_Specific_Trait_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Developmental_Specific_Trait_Model.rds")})
+    Developmental_Specific_Trait_Model <- readRDS("./Complex_Developmental_Specific_Trait_Model.rds")})
 
 Developmental_Specific_Trait_Model_rob <- robust(Developmental_Specific_Trait_Model, cluster = Developmental_Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -6940,7 +6940,7 @@ Developmental_Exposure_Time_Final_Counts <- Developmental_Exposure_Time_Studies 
   left_join(Developmental_Exposure_Time_Species, by = "Developmental_Exposure_Time_Original") %>% 
   left_join(Developmental_Exposure_Time_Effects, by = "Developmental_Exposure_Time_Original")
 
-write.csv(Developmental_Exposure_Time_Final_Counts, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Developmental_Exposure_Time_Final_Counts.csv", row.names = FALSE)
+write.csv(Developmental_Exposure_Time_Final_Counts, file = "./Complex_Developmental_Exposure_Time_Final_Counts.csv", row.names = FALSE)
 
 Acclimation_Pre_Data <- Individual_Pre_Data %>% filter(Plasticity_Mechanism == "Acclimation") %>% 
   select("Study_ID", "Species_ID", "Treatment_ID", "Trait_ID", "Acclimation_Life.History_Stage") %>% 
@@ -6968,7 +6968,7 @@ Acclimation_LH_Stage_Final_Counts <- Acclimation_LH_Stage_Studies %>%
   left_join(Acclimation_LH_Stage_Species, by = "Acclimation_Life.History_Stage_Original") %>% 
   left_join(Acclimation_LH_Stage_Effects, by = "Acclimation_Life.History_Stage_Original")
 
-write.csv(Acclimation_LH_Stage_Final_Counts, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Acclimation_LH_Stage_Final_Counts.csv", row.names = FALSE)
+write.csv(Acclimation_LH_Stage_Final_Counts, file = "./Complex_Acclimation_LH_Stage_Final_Counts.csv", row.names = FALSE)
 
 Measurements_Pre_Data <- Complex_Pre_Data %>%
   select("Study_ID", "Species_ID", "Treatment_ID", "Trait_ID", "Measurement") %>% 
@@ -6996,7 +6996,7 @@ Measurement_Final_Counts <- Measurement_Studies %>%
   left_join(Measurement_Species, by = "Measurement_Original") %>% 
   left_join(Measurement_Effects, by = "Measurement_Original")
 
-write.csv(Measurement_Final_Counts, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Measurement_Final_Counts.csv", row.names = FALSE)
+write.csv(Measurement_Final_Counts, file = "./Complex_Measurement_Final_Counts.csv", row.names = FALSE)
 
 # Category - Studies, Species and Effect Sizes
 
@@ -7018,7 +7018,7 @@ Developmental_Exposure_Time_Category_Final_Counts <- Developmental_Exposure_Time
   left_join(Developmental_Exposure_Time_Category_Species, by = "Developmental_Exposure_Time_Category") %>% 
   left_join(Developmental_Exposure_Time_Category_Effects, by = "Developmental_Exposure_Time_Category")
 
-write.csv(Developmental_Exposure_Time_Category_Final_Counts, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Developmental_Exposure_Time_Category_Final_Counts.csv", row.names = FALSE)
+write.csv(Developmental_Exposure_Time_Category_Final_Counts, file = "./Complex_Developmental_Exposure_Time_Category_Final_Counts.csv", row.names = FALSE)
 
 Acclimation_LH_Stage_Category_Studies <- Acclimation_Subset_Data %>% select("Study_ID", "Acclimation_Life.History_Stage_Category") %>% table() %>% data.frame() %>% 
   filter(`Freq` != 0) %>% select("Acclimation_Life.History_Stage_Category") %>% table() %>% data.frame()
@@ -7038,7 +7038,7 @@ Acclimation_LH_Stage_Category_Final_Counts <- Acclimation_LH_Stage_Category_Stud
   left_join(Acclimation_LH_Stage_Category_Species, by = "Acclimation_Life.History_Stage_Category") %>% 
   left_join(Acclimation_LH_Stage_Category_Effects, by = "Acclimation_Life.History_Stage_Category")
 
-write.csv(Acclimation_LH_Stage_Category_Final_Counts, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Acclimation_LH_Stage_Category_Final_Counts.csv", row.names = FALSE)
+write.csv(Acclimation_LH_Stage_Category_Final_Counts, file = "./Complex_Acclimation_LH_Stage_Category_Final_Counts.csv", row.names = FALSE)
 
 Measurement_Category_Studies <- data %>% select("Study_ID", "Trait_Category") %>% table() %>% data.frame() %>% 
   filter(`Freq` != 0) %>% select("Trait_Category") %>% table() %>% data.frame()
@@ -7058,7 +7058,7 @@ Measurement_Category_Final_Counts <- Measurement_Category_Studies %>%
   left_join(Measurement_Category_Species, by = "Trait_Category") %>% 
   left_join(Measurement_Category_Effects, by = "Trait_Category")
 
-write.csv(Measurement_Category_Final_Counts, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Measurement_Category_Final_Counts.csv", row.names = FALSE)
+write.csv(Measurement_Category_Final_Counts, file = "./Complex_Measurement_Category_Final_Counts.csv", row.names = FALSE)
 
 # Phylogenetic Tree with labels
 
@@ -7520,43 +7520,43 @@ Raw_Developmental_Specific_Trait <- data.frame("Specific Phenotypic Traits" = c(
                                                "df" = c(Developmental_Specific_Trait_Model$ddf[[1]], Developmental_Specific_Trait_Model$ddf[[2]], Developmental_Specific_Trait_Model$ddf[[3]]), 
                                                "p-value" = c(Developmental_Specific_Trait_Model$pval[1], Developmental_Specific_Trait_Model$pval[2], Developmental_Specific_Trait_Model$pval[3]))
 
-write.csv(Raw_Overall, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Overall.csv", row.names = FALSE)
-write.csv(Raw_Amplitude, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Amplitude.csv", row.names = FALSE)
-write.csv(Raw_Fluctuation_Type, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Fluctuation_Type.csv", row.names = FALSE)
-write.csv(Raw_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Trait.csv", row.names = FALSE)
-write.csv(Raw_Class, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Class.csv", row.names = FALSE)
-write.csv(Raw_Specific_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Specific_Trait.csv", row.names = FALSE)
-write.csv(Raw_Individual, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Individual.csv", row.names = FALSE)
-write.csv(Raw_Individual_Amplitude, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Individual_Amplitude.csv", row.names = FALSE)
-write.csv(Raw_Individual_Fluctuation_Type, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Individual_Fluctuation_Type.csv", row.names = FALSE)
-write.csv(Raw_Individual_Class, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Individual_Class.csv", row.names = FALSE)
-write.csv(Raw_Aquatic, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Aquatic.csv", row.names = FALSE)
-write.csv(Raw_Aquatic_Amplitude, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Aquatic_Amplitude.csv", row.names = FALSE)
-write.csv(Raw_Aquatic_Fluctuation_Type, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Aquatic_Fluctuation_Type.csv", row.names = FALSE)
-write.csv(Raw_Aquatic_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Aquatic_Trait.csv", row.names = FALSE)
-write.csv(Raw_Aquatic_Plasticity, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Aquatic_Plasticity.csv", row.names = FALSE)
-write.csv(Raw_Terrestrial, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Terrestrial.csv", row.names = FALSE)
-write.csv(Raw_Terrestrial_Amplitude, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Terrestrial_Amplitude.csv", row.names = FALSE)
-write.csv(Raw_Terrestrial_Fluctuation_Type, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Terrestrial_Fluctuation_Type.csv", row.names = FALSE)
-write.csv(Raw_Terrestrial_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Terrestrial_Trait.csv", row.names = FALSE)
-write.csv(Raw_Terrestrial_Plasticity, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Terrestrial_Plasticity.csv", row.names = FALSE)
-write.csv(Raw_Terrestrial_Specific_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Terrestrial_Specific_Trait.csv", row.names = FALSE)
-write.csv(Raw_Acclimation, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Amplitude, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Amplitude.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Exposure, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Exposure.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Frequency, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Frequency.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Fluctuation_Type, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Fluctuation_Type.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Trait.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Stage, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Stage.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Class, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Class.csv", row.names = FALSE)
-write.csv(Raw_Acclimation_Specific_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Acclimation_Specific_Trait.csv", row.names = FALSE)
-write.csv(Raw_Developmental, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental.csv", row.names = FALSE)
-write.csv(Raw_Developmental_Amplitude, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental_Amplitude.csv", row.names = FALSE)
-write.csv(Raw_Developmental_Fluctuation_Type, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental_Fluctuation_Type.csv", row.names = FALSE)
-write.csv(Raw_Developmental_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental_Trait.csv", row.names = FALSE)
-write.csv(Raw_Developmental_Exposure, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental_Exposure.csv", row.names = FALSE)
-write.csv(Raw_Developmental_Class, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental_Class.csv", row.names = FALSE)
-write.csv(Raw_Developmental_Specific_Trait, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Raw_Developmental_Specific_Trait.csv", row.names = FALSE)
+write.csv(Raw_Overall, file = "./Complex_Raw_Overall.csv", row.names = FALSE)
+write.csv(Raw_Amplitude, file = "./Complex_Raw_Amplitude.csv", row.names = FALSE)
+write.csv(Raw_Fluctuation_Type, file = "./Complex_Raw_Fluctuation_Type.csv", row.names = FALSE)
+write.csv(Raw_Trait, file = "./Complex_Raw_Trait.csv", row.names = FALSE)
+write.csv(Raw_Class, file = "./Complex_Raw_Class.csv", row.names = FALSE)
+write.csv(Raw_Specific_Trait, file = "./Complex_Raw_Specific_Trait.csv", row.names = FALSE)
+write.csv(Raw_Individual, file = "./Complex_Raw_Individual.csv", row.names = FALSE)
+write.csv(Raw_Individual_Amplitude, file = "./Complex_Raw_Individual_Amplitude.csv", row.names = FALSE)
+write.csv(Raw_Individual_Fluctuation_Type, file = "./Complex_Raw_Individual_Fluctuation_Type.csv", row.names = FALSE)
+write.csv(Raw_Individual_Class, file = "./Complex_Raw_Individual_Class.csv", row.names = FALSE)
+write.csv(Raw_Aquatic, file = "./Complex_Raw_Aquatic.csv", row.names = FALSE)
+write.csv(Raw_Aquatic_Amplitude, file = "./Complex_Raw_Aquatic_Amplitude.csv", row.names = FALSE)
+write.csv(Raw_Aquatic_Fluctuation_Type, file = "./Complex_Raw_Aquatic_Fluctuation_Type.csv", row.names = FALSE)
+write.csv(Raw_Aquatic_Trait, file = "./Complex_Raw_Aquatic_Trait.csv", row.names = FALSE)
+write.csv(Raw_Aquatic_Plasticity, file = "./Complex_Raw_Aquatic_Plasticity.csv", row.names = FALSE)
+write.csv(Raw_Terrestrial, file = "./Complex_Raw_Terrestrial.csv", row.names = FALSE)
+write.csv(Raw_Terrestrial_Amplitude, file = "./Complex_Raw_Terrestrial_Amplitude.csv", row.names = FALSE)
+write.csv(Raw_Terrestrial_Fluctuation_Type, file = "./Complex_Raw_Terrestrial_Fluctuation_Type.csv", row.names = FALSE)
+write.csv(Raw_Terrestrial_Trait, file = "./Complex_Raw_Terrestrial_Trait.csv", row.names = FALSE)
+write.csv(Raw_Terrestrial_Plasticity, file = "./Complex_Raw_Terrestrial_Plasticity.csv", row.names = FALSE)
+write.csv(Raw_Terrestrial_Specific_Trait, file = "./Complex_Raw_Terrestrial_Specific_Trait.csv", row.names = FALSE)
+write.csv(Raw_Acclimation, file = "./Complex_Raw_Acclimation.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Amplitude, file = "./Complex_Raw_Acclimation_Amplitude.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Exposure, file = "./Complex_Raw_Acclimation_Exposure.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Frequency, file = "./Complex_Raw_Acclimation_Frequency.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Fluctuation_Type, file = "./Complex_Raw_Acclimation_Fluctuation_Type.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Trait, file = "./Complex_Raw_Acclimation_Trait.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Stage, file = "./Complex_Raw_Acclimation_Stage.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Class, file = "./Complex_Raw_Acclimation_Class.csv", row.names = FALSE)
+write.csv(Raw_Acclimation_Specific_Trait, file = "./Complex_Raw_Acclimation_Specific_Trait.csv", row.names = FALSE)
+write.csv(Raw_Developmental, file = "./Complex_Raw_Developmental.csv", row.names = FALSE)
+write.csv(Raw_Developmental_Amplitude, file = "./Complex_Raw_Developmental_Amplitude.csv", row.names = FALSE)
+write.csv(Raw_Developmental_Fluctuation_Type, file = "./Complex_Raw_Developmental_Fluctuation_Type.csv", row.names = FALSE)
+write.csv(Raw_Developmental_Trait, file = "./Complex_Raw_Developmental_Trait.csv", row.names = FALSE)
+write.csv(Raw_Developmental_Exposure, file = "./Complex_Raw_Developmental_Exposure.csv", row.names = FALSE)
+write.csv(Raw_Developmental_Class, file = "./Complex_Raw_Developmental_Class.csv", row.names = FALSE)
+write.csv(Raw_Developmental_Specific_Trait, file = "./Complex_Raw_Developmental_Specific_Trait.csv", row.names = FALSE)
 
 # Heterogeneity Table
 
@@ -7662,9 +7662,9 @@ Heterogeneity_Developmental <- data.frame("Models" = c("Developmental", "Exposur
                                           "Total" = c(Developmental_Model_i2[1, 1], Developmental_Exposure_Model_i2[1, 1], Developmental_Amplitude_Model_i2[1, 1], Developmental_Fluctuation_Model_i2[1, 1], 
                                                       Developmental_Trait_Model_i2[1, 1], Developmental_Specific_Trait_Model_i2[1, 1], Developmental_Class_Model_i2[1, 1]))
 
-write.csv(Heterogeneity_Overall, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Heterogeneity_Overall.csv", row.names = FALSE)
-write.csv(Heterogeneity_Individual, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Heterogeneity_Individual.csv", row.names = FALSE)
-write.csv(Heterogeneity_Aquatic, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Heterogeneity_Aquatic.csv", row.names = FALSE)
-write.csv(Heterogeneity_Terrestrial, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Heterogeneity_Terrestrial.csv", row.names = FALSE)
-write.csv(Heterogeneity_Acclimation, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Heterogeneity_Acclimation.csv", row.names = FALSE)
-write.csv(Heterogeneity_Developmental, file = "./3.Data_Analysis/2.Outputs/Supplementary_Material/Complex_Heterogeneity_Developmental.csv", row.names = FALSE)
+write.csv(Heterogeneity_Overall, file = "./Complex_Heterogeneity_Overall.csv", row.names = FALSE)
+write.csv(Heterogeneity_Individual, file = "./Complex_Heterogeneity_Individual.csv", row.names = FALSE)
+write.csv(Heterogeneity_Aquatic, file = "./Complex_Heterogeneity_Aquatic.csv", row.names = FALSE)
+write.csv(Heterogeneity_Terrestrial, file = "./Complex_Heterogeneity_Terrestrial.csv", row.names = FALSE)
+write.csv(Heterogeneity_Acclimation, file = "./Complex_Heterogeneity_Acclimation.csv", row.names = FALSE)
+write.csv(Heterogeneity_Developmental, file = "./Complex_Heterogeneity_Developmental.csv", row.names = FALSE)
