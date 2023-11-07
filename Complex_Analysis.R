@@ -26,8 +26,8 @@ A_cor <- ape::vcv.phylo(phy, corr = TRUE)
 VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
 
 ##### Overall Model #####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Overall_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = VCV, test = "t", dfs = "contain",
                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -45,8 +45,8 @@ Overall_Model_Estimates <- data.frame(estimate = Overall_Model$b, ci.lb = Overal
 Overall_Model_i2 <- data.frame(round(orchaRd::i2_ml(Overall_Model), 2))
 
 #### Overall Model - Fluctuation Amplitude Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = VCV, test = "t", dfs = "contain",
                                        mods = ~ Fluctuation_Magnitude - 1,
@@ -116,8 +116,8 @@ Fluctuation_A_cor <- as.matrix(Fluctuation_A_cor)
 
 Fluctuation_VCV <- make_VCV_matrix(Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Fluctuation_VCV, test = "t", dfs = "contain",
                                          mods = ~ Fluctuation_Category - 1,
@@ -398,8 +398,8 @@ Trait_A_cor <- as.matrix(Trait_A_cor)
 
 Trait_VCV <- make_VCV_matrix(Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Trait_VCV, test = "t", dfs = "contain",
                                    mods = ~ Trait_Category - 1,
@@ -702,8 +702,8 @@ Class_A_cor <- as.matrix(Class_A_cor)
 
 Class_VCV <- make_VCV_matrix(Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Class_Model <- metafor::rma.mv(InRR_Transformed, V = Class_VCV, test = "t", dfs = "contain",
                                    mods = ~ Class - 1,
@@ -985,8 +985,8 @@ Specific_Trait_A_cor <- as.matrix(Specific_Trait_A_cor)
 
 Specific_Trait_VCV <- make_VCV_matrix(Specific_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Specific_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Specific_Trait_VCV, test = "t", dfs = "contain",
                                             mods = ~ Measurement - 1,
@@ -1272,8 +1272,8 @@ Individual_A_cor <- as.matrix(Individual_A_cor)
 
 Individual_VCV <- make_VCV_matrix(Individual_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Individual_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Individual_VCV, test = "t", dfs = "contain",
                                         random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -1290,8 +1290,8 @@ Individual_Model_Estimates <- data.frame(estimate = Individual_Model$b, ci.lb = 
 Individual_Model_i2 <- data.frame(round(orchaRd::i2_ml(Individual_Model), 2))
 
 #### Individual-Level Subset Model - Fluctuation Amplitude Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Individual_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_VCV, test = "t", dfs = "contain",
                                                   mods = ~ Fluctuation_Magnitude - 1,
@@ -1363,8 +1363,8 @@ Individual_Fluctuation_A_cor <- as.matrix(Individual_Fluctuation_A_cor)
 
 Individual_Fluctuation_VCV <- make_VCV_matrix(Individual_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Individual_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_Fluctuation_VCV, test = "t", dfs = "contain",
                                                     mods = ~ Fluctuation_Category - 1,
@@ -1645,8 +1645,8 @@ Individual_Class_A_cor <- as.matrix(Individual_Class_A_cor)
 
 Individual_Class_VCV <- make_VCV_matrix(Individual_Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Individual_Class_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_Class_VCV, test = "t", dfs = "contain",
                                               mods = ~ Class - 1,
@@ -1893,8 +1893,8 @@ Aquatic_A_cor <- as.matrix(Aquatic_A_cor)
 
 Aquatic_VCV <- make_VCV_matrix(Aquatic_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Aquatic_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Aquatic_VCV, test = "t", dfs = "contain",
                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -1911,8 +1911,8 @@ Aquatic_Model_Estimates <- data.frame(estimate = Aquatic_Model$b, ci.lb = Aquati
 Aquatic_Model_i2 <- data.frame(round(orchaRd::i2_ml(Aquatic_Model), 2))
 
 #### Aquatic Subset Model - Fluctuation Amplitude Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Aquatic_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_VCV, test = "t", dfs = "contain",
                                                mods = ~ Fluctuation_Magnitude - 1,
@@ -1985,8 +1985,8 @@ Aquatic_Fluctuation_A_cor <- as.matrix(Aquatic_Fluctuation_A_cor)
 
 Aquatic_Fluctuation_VCV <- make_VCV_matrix(Aquatic_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Aquatic_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_Fluctuation_VCV, test = "t", dfs = "contain",
                                                  mods = ~ Fluctuation_Category - 1,
@@ -2250,8 +2250,8 @@ Aquatic_Trait_A_cor <- as.matrix(Aquatic_Trait_A_cor)
 
 Aquatic_Trait_VCV <- make_VCV_matrix(Aquatic_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Aquatic_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_Trait_VCV, test = "t", dfs = "contain",
                                            mods = ~ Trait_Category - 1,
@@ -2500,8 +2500,8 @@ Aquatic_Plasticity_Study_Count <- Aquatic_Subset_Data %>% select("Study_ID", "Pl
   filter(`Freq` != 0) %>% select("Plasticity_Mechanism") %>% table() %>% data.frame()
 rownames(Aquatic_Plasticity_Study_Count) <- Aquatic_Plasticity_Study_Count$Plasticity_Mechanism
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Aquatic_Plasticity_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_VCV, test = "t", dfs = "contain",
                                                 mods = ~ Plasticity_Mechanism - 1,
@@ -2748,8 +2748,8 @@ Terrestrial_A_cor <- as.matrix(Terrestrial_A_cor)
 
 Terrestrial_VCV <- make_VCV_matrix(Terrestrial_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Terrestrial_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Terrestrial_VCV, test = "t", dfs = "contain",
                                          random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -2766,8 +2766,8 @@ Terrestrial_Model_Estimates <- data.frame(estimate = Terrestrial_Model$b, ci.lb 
 Terrestrial_Model_i2 <- data.frame(round(orchaRd::i2_ml(Terrestrial_Model), 2))
 
 #### Terrestrial Subset Model - Fluctuation Amplitude Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Terrestrial_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_VCV, test = "t", dfs = "contain",
                                                    mods = ~ Fluctuation_Magnitude - 1,
@@ -2839,8 +2839,8 @@ Terrestrial_Fluctuation_A_cor <- as.matrix(Terrestrial_Fluctuation_A_cor)
 
 Terrestrial_Fluctuation_VCV <- make_VCV_matrix(Terrestrial_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Terrestrial_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_Fluctuation_VCV, test = "t", dfs = "contain",
                                                      mods = ~ Fluctuation_Category - 1,
@@ -3120,8 +3120,8 @@ Terrestrial_Trait_A_cor <- as.matrix(Terrestrial_Trait_A_cor)
 
 Terrestrial_Trait_VCV <- make_VCV_matrix(Terrestrial_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Terrestrial_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_Trait_VCV, test = "t", dfs = "contain",
                                                mods = ~ Trait_Category - 1,
@@ -3406,8 +3406,8 @@ Terrestrial_Plasticity_Study_Count <- Terrestrial_Subset_Data %>% select("Study_
   filter(`Freq` != 0) %>% select("Plasticity_Mechanism") %>% table() %>% data.frame()
 rownames(Terrestrial_Plasticity_Study_Count) <- Terrestrial_Plasticity_Study_Count$Plasticity_Mechanism
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Terrestrial_Plasticity_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_VCV, test = "t", dfs = "contain",
                                                     mods = ~ Plasticity_Mechanism - 1,
@@ -3669,8 +3669,8 @@ Terrestrial_Specific_Trait_A_cor <- as.matrix(Terrestrial_Specific_Trait_A_cor)
 
 Terrestrial_Specific_Trait_VCV <- make_VCV_matrix(Terrestrial_Specific_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Terrestrial_Specific_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_Specific_Trait_VCV, test = "t", dfs = "contain",
                                                         mods = ~ Measurement - 1,
@@ -3935,8 +3935,8 @@ Acclimation_A_cor <- as.matrix(Acclimation_A_cor)
 
 Acclimation_VCV <- make_VCV_matrix(Acclimation_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Acclimation_VCV, test = "t", dfs = "contain",
                                          random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -3953,8 +3953,8 @@ Acclimation_Model_Estimates <- data.frame(estimate = Acclimation_Model$b, ci.lb 
 Acclimation_Model_i2 <- data.frame(round(orchaRd::i2_ml(Acclimation_Model), 2))
 
 #### Acclimation Subset Model - Fluctuation Amplitude Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_VCV, test = "t", dfs = "contain",
                                                    mods = ~ Fluctuation_Magnitude - 1,
@@ -4003,8 +4003,8 @@ Acclimation_Amplitude_Plot <- ggplot(Acclimation_Plot_Data, aes(x = Fluctuation_
 Acclimation_Amplitude_Plot #(330x330)
 
 #### Acclimation Subset Model - Exposure Time Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Exposure_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_VCV, test = "t", dfs = "contain",
                                                   mods = ~ Acclimation_Exposure_Time - 1,
@@ -4062,8 +4062,8 @@ Acclimation_Frequency_A_cor <- as.matrix(Acclimation_Frequency_A_cor)
 
 Acclimation_Frequency_VCV <- make_VCV_matrix(Acclimation_Frequency_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Frequency_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Frequency_VCV, test = "t", dfs = "contain",
                                                    mods = ~ Number_Of_Fluctuations - 1,
@@ -4136,8 +4136,8 @@ Acclimation_Fluctuation_A_cor <- as.matrix(Acclimation_Fluctuation_A_cor)
 
 Acclimation_Fluctuation_VCV <- make_VCV_matrix(Acclimation_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Fluctuation_VCV, test = "t", dfs = "contain",
                                                      mods = ~ Fluctuation_Category - 1,
@@ -4400,8 +4400,8 @@ Acclimation_Trait_A_cor <- as.matrix(Acclimation_Trait_A_cor)
 
 Acclimation_Trait_VCV <- make_VCV_matrix(Acclimation_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Trait_VCV, test = "t", dfs = "contain",
                                                mods = ~ Trait_Category - 1,
@@ -4660,8 +4660,8 @@ Acclimation_Stage_A_cor <- as.matrix(Acclimation_Stage_A_cor)
 
 Acclimation_Stage_VCV <- make_VCV_matrix(Acclimation_Stage_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Stage_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Stage_VCV, test = "t", dfs = "contain",
                                                mods = ~ Acclimation_Life.History_Stage_Category - 1,
@@ -4941,8 +4941,8 @@ Acclimation_Class_A_cor <- as.matrix(Acclimation_Class_A_cor)
 
 Acclimation_Class_VCV <- make_VCV_matrix(Acclimation_Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Class_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Acclimation_Class_VCV, test = "t", dfs = "contain",
                                                random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -5053,8 +5053,8 @@ Acclimation_Specific_Trait_A_cor <- as.matrix(Acclimation_Specific_Trait_A_cor)
 
 Acclimation_Specific_Trait_VCV <- make_VCV_matrix(Acclimation_Specific_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Acclimation_Specific_Trait_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Acclimation_Specific_Trait_VCV, test = "t", dfs = "contain",
                                                         random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -5151,8 +5151,8 @@ Developmental_A_cor <- as.matrix(Developmental_A_cor)
 
 Developmental_VCV <- make_VCV_matrix(Developmental_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Developmental_VCV, test = "t", dfs = "contain",
                                            random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
@@ -5169,8 +5169,8 @@ Developmental_Model_Estimates <- data.frame(estimate = Developmental_Model$b, ci
 Developmental_Model_i2 <- data.frame(round(orchaRd::i2_ml(Developmental_Model), 2))
 
 #### Developmental Subset Model - Fluctuation Amplitude Meta-Regression ####
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Developmental_VCV, test = "t", dfs = "contain",
                                                      mods = ~ Fluctuation_Magnitude - 1,
@@ -5241,8 +5241,8 @@ Developmental_Fluctuation_A_cor <- as.matrix(Developmental_Fluctuation_A_cor)
 
 Developmental_Fluctuation_VCV <- make_VCV_matrix(Developmental_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Developmental_Fluctuation_VCV, test = "t", dfs = "contain",
                                                        mods = ~ Fluctuation_Category - 1,
@@ -5524,8 +5524,8 @@ Developmental_Trait_A_cor <- as.matrix(Developmental_Trait_A_cor)
 
 Developmental_Trait_VCV <- make_VCV_matrix(Developmental_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Developmental_Trait_VCV, test = "t", dfs = "contain",
                                                  mods = ~ Trait_Category - 1,
@@ -5775,8 +5775,8 @@ Developmental_Exposure_Study_Count <- Developmental_Subset_Data %>% select("Stud
   filter(`Freq` != 0) %>% select("Developmental_Exposure_Time_Category") %>% table() %>% data.frame()
 rownames(Developmental_Exposure_Study_Count) <- Developmental_Exposure_Study_Count$Developmental_Exposure_Time_Category
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Exposure_Model <- metafor::rma.mv(InRR_Transformed, V = Developmental_VCV, test = "t", dfs = "contain",
                                                     mods = ~ Developmental_Exposure_Time_Category - 1,
@@ -6056,8 +6056,8 @@ Developmental_Class_A_cor <- as.matrix(Developmental_Class_A_cor)
 
 Developmental_Class_VCV <- make_VCV_matrix(Developmental_Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Class_Model <- metafor::rma.mv(InRR_Transformed, V = Developmental_Class_VCV, test = "t", dfs = "contain",
                                                  mods = ~ Class - 1,
@@ -6320,8 +6320,8 @@ Developmental_Specific_Trait_A_cor <- as.matrix(Developmental_Specific_Trait_A_c
 
 Developmental_Specific_Trait_VCV <- make_VCV_matrix(Developmental_Specific_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Developmental_Specific_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Developmental_Specific_Trait_VCV, test = "t", dfs = "contain",
                                                           mods = ~ Measurement - 1,
