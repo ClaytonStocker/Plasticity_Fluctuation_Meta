@@ -10,13 +10,13 @@ pacman::p_load(tidyverse, readxl, gtsummary, dplyr,
                robumeta, ggpmisc, ggpubr)
 
 # Importing Data Set
-data <- read.csv("./3.Data_Analysis/2.Outputs/Data/Complex_Final_Data.csv")
+data <- read.csv("./Complex_Final_Data.csv")
 data$obs <- 1:nrow(data)
 data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
 data$phylo <- data$Scientific_Name
 
 # Phylogenetic covariance matrix
-tree <- ape::read.tree("./3.Data_Analysis/2.Outputs/Phylogeny/Complex_tree")
+tree <- ape::read.tree("./Complex_tree")
 phy <- ape::compute.brlen(tree, method = "Grafen", power = 1)
 A <- ape::vcv.phylo(phy)
 row.names(A) <- colnames(A) <- row.names(A)
@@ -30,7 +30,7 @@ VCV_Untransformed <- make_VCV_matrix(data, V = "v_InRR_Untransformed", cluster =
 ##### Publication Bias #####
 
 # Model of the Residuals from the Overall Model. 
-Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Overall_Model.rds")
+Model <- readRDS("./Complex_Overall_Model.rds")
 Residuals <- rstandard(Model)
 Residuals[c("slab", "digits")] = NULL
 Residuals_df <- do.call("rbind", Residuals)
@@ -63,7 +63,7 @@ Publication_Graph <- ggplot(Graph_Data, aes(x = Year, y = InRR_Transformed)) +
                          parse = TRUE) #+
                      #coord_cartesian(xlim = c(0, 25), 
                      #                ylim = c(-5, 5))
-Publication_Graph #(750x500)
+Publication_Graph
 
 # Funnel Plot
 par(mfrow = c(1,2))
@@ -86,8 +86,8 @@ legend("top", legend = c("0.05 < p ≤ 1.00", "0 < p ≤ 0.05", "Studies", "Fill
 Eggers_Test <- regtest(Residuals_Model, model = "lm")
 
 # Time-lag Bias
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     TL_Model <- metafor::rma.mv(InRR_Transformed, V = VCV, test = "t", dfs = "contain",
                                 mods = ~ Year_Z + Precision - 1,
@@ -95,53 +95,53 @@ system.time( #  1ish minutes
                                               ~1|Shared_Animal_Number, ~1|Measurement), 
                                 R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                 control=list(rel.tol=1e-9))
-    saveRDS(TL_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_TL_Model.rds")
+    saveRDS(TL_Model, "./Complex_TL_Model.rds")
   } else {
-    TL_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_TL_Model.rds")})
+    TL_Model <- readRDS("./Complex_TL_Model.rds")})
 
 ##### Sensitivity Analysis #####
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Cooks_Overall_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = v_InRR, test = "t", dfs = "contain",
                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                      control=list(rel.tol=1e-9))
-    saveRDS(Cooks_Overall_Model, "./3.Data_Analysis/2.Outputs/Models/Cooks_Complex_Overall_Model.rds")
+    saveRDS(Cooks_Overall_Model, "./Cooks_Complex_Overall_Model.rds")
   } else {
-    Cooks_Overall_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Cooks_Complex_Overall_Model.rds")})
+    Cooks_Overall_Model <- readRDS("./Cooks_Complex_Overall_Model.rds")})
 
 # Cooks Distance
-#run <- FALSE
-#system.time( #  9.5 Days
-#  if(run){
-#    Overall_Cooks <- cooks.distance(Cooks_Overall_Model)
-#    saveRDS(Overall_Cooks, "./3.Data_Analysis/2.Outputs/Models/Complex_Overall_Cooks.rds")
-#  } else {
-#    Overall_Cooks <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Overall_Cooks.rds")})
-#
-#dev.off()
-#Cooks_Plot <- plot(Overall_Cooks, type = "o", pch = 21, xlab = "Observed Outcome", 
-#                   ylab = "Cook's Distance", bg = "#183357")
-#box(lwd = 2)
+run <- TRUE
+system.time( #  9.5 Days
+  if(run){
+    Overall_Cooks <- cooks.distance(Cooks_Overall_Model)
+    saveRDS(Overall_Cooks, "./Complex_Overall_Cooks.rds")
+  } else {
+    Overall_Cooks <- readRDS("./Complex_Overall_Cooks.rds")})
+
+dev.off()
+Cooks_Plot <- plot(Overall_Cooks, type = "o", pch = 21, xlab = "Observed Outcome", 
+                   ylab = "Cook's Distance", bg = "#183357")
+box(lwd = 2)
 
 # Untransformed
 Model_Estimates <- data.frame(estimate = Model$b, ci.lb = Model$ci.lb, ci.ub = Model$ci.ub)
 Model_i2 <- data.frame(round(orchaRd::i2_ml(Model), 2))
 
-run <- FALSE
-system.time( #  1ish minutes
+run <- TRUE
+system.time(
   if(run){
     Untransformed_Model <- metafor::rma.mv(InRR_Untransformed ~ 1, V = VCV_Untransformed, test = "t", dfs = "contain",
                                            random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                          ~1|Shared_Animal_Number, ~1|Measurement), 
                                            R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                            control=list(rel.tol=1e-9))
-    saveRDS(Untransformed_Model, "./3.Data_Analysis/2.Outputs/Models/Complex_Untransformed_Model.rds")
+    saveRDS(Untransformed_Model, "./Complex_Untransformed_Model.rds")
   } else {
-    Untransformed_Model <- readRDS("./3.Data_Analysis/2.Outputs/Models/Complex_Untransformed_Model.rds")})
+    Untransformed_Model <- readRDS("./Complex_Untransformed_Model.rds")})
 
 Untransformed_Model_Estimates <- data.frame(estimate = Untransformed_Model$b, ci.lb = Untransformed_Model$ci.lb, ci.ub = Untransformed_Model$ci.ub)
 Untransformed_Model_i2 <- data.frame(round(orchaRd::i2_ml(Untransformed_Model), 2))
