@@ -59,13 +59,13 @@ Animal_Overlap_Trait_T1	| Identifier for effect sizes that measure phenotypic tr
 Animal_Overlap_T2_Constant	| Identifier for effect sizes where the constant treatment was conducted on the same animals within a study (second constant and fluctuating temperature treatment pair). 
 Animal_Overlap_T2_Fluctuation	| Identifier for effect sizes where the fluctuating treatment was conducted on the same animals within a study (second constant and fluctuating temperature treatment pair). 
 Animal_Overlap_Trait_T2	| Identifier for effect sizes that measure phenotypic traits on the same animal within a study (second constant and fluctuating temperature treatment pair). 
-Animal_Code	| Study ID: Species Overlap: Animal Overlap T1 Constant: Animal Overlap T1 Fluctuation: Animal Overlap T2 Constant: Animal Overlap T2 Fluctuation: Animal Overlap Trait T1; Animal Overlap Trait T2
+Animal_Code	| Study ID: Species Overlap: Animal Overlap T1 Constant: Animal Overlap T1 Fluctuation: Animal Overlap T2 | Constant: Animal Overlap T2 Fluctuation: Animal Overlap Trait T1; Animal Overlap Trait T2
 Shared_Animal_Number| 	Unique identifier for shared animal codes across effect sizes. 
 Shared_Control_T1	| Identifier for effect sizes that use the same constant temperature treatment within a study (first constant and fluctuating temperature treatment pair). 
 Shared_Control_T2	| Identifier for effect sizes that use the same constant temperature treatment within a study (second constant and fluctuating temperature treatment pair). 
 Shared_Control_Code	| Study ID: Species Overlap: Shared Control T1: Shared Control T2: Trait ID. 
 Shared_Control_Number| 	Unique identifier for shared control codes across effect sizes. 
-n_T1_C	Sample size of the constant treatment (first constant and fluctuating temperature treatment pair). 
+n_T1_C	| Sample size of the constant treatment (first constant and fluctuating temperature treatment pair). 
 Mean_T1_C	| Mean response of the constant treatment (first constant and fluctuating temperature treatment pair).
 SD_Final_T1_C	| Standard deviation of the constant treatment (first constant and fluctuating temperature treatment pair).
 n_T1_F	| Sample size of the fluctuating treatment (first constant and fluctuating temperature treatment pair). 
