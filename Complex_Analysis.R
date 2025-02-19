@@ -1,3 +1,5 @@
+
+# Clean working space and load packages
 rm(list = ls())
 if (!require("pacman")) install.packages("pacman")
 if (!require("devtools")) install.packages("devtools")
@@ -34,9 +36,9 @@ system.time(
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                      control=list(rel.tol=1e-9))
-    saveRDS(Overall_Model, "./Complex_Overall_Model.rds")
+    saveRDS(Overall_Model, "./output/models/Complex_Overall_Model.rds")
   } else {
-    Overall_Model <- readRDS("./Complex_Overall_Model.rds")})
+    Overall_Model <- readRDS("./output/models/Complex_Overall_Model.rds")})
 
 Overall_Model_rob <- robust(Overall_Model, cluster = data$Study_ID, adjust = TRUE)
 
@@ -54,9 +56,9 @@ system.time(
                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
                                        R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
                                        control=list(rel.tol=1e-9))
-    saveRDS(Amplitude_Model, "./Complex_Amplitude_Model.rds")
+    saveRDS(Amplitude_Model, "./output/models/Complex_Amplitude_Model.rds")
   } else {
-    Amplitude_Model <- readRDS("./Complex_Amplitude_Model.rds")})
+    Amplitude_Model <- readRDS("./output/models/Complex_Amplitude_Model.rds")})
 
 Amplitude_Model_rob <- robust(Amplitude_Model, cluster = data$Study_ID, adjust = TRUE)
 
@@ -125,9 +127,9 @@ system.time(
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Fluctuation_A_cor), data = Fluctuation_Data, method = "REML", sparse = TRUE, 
                                          control=list(rel.tol=1e-9))
-    saveRDS(Fluctuation_Model, "./Complex_Fluctuation_Model.rds")
+    saveRDS(Fluctuation_Model, "./output/models/Complex_Fluctuation_Model.rds")
   } else {
-    Fluctuation_Model <- readRDS("./Complex_Fluctuation_Model.rds")})
+    Fluctuation_Model <- readRDS("./output/models/Complex_Fluctuation_Model.rds")})
 
 Fluctuation_Model_rob <- robust(Fluctuation_Model, cluster = Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -407,9 +409,9 @@ system.time(
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                    R = list(phylo=Trait_A_cor), data = Trait_Data, method = "REML", sparse = TRUE, 
                                    control=list(rel.tol=1e-9))
-    saveRDS(Trait_Model, "./Complex_Trait_Model.rds")
+    saveRDS(Trait_Model, "./output/models/Complex_Trait_Model.rds")
   } else {
-    Trait_Model <- readRDS("./Complex_Trait_Model.rds")})
+    Trait_Model <- readRDS("./output/models/Complex_Trait_Model.rds")})
 
 Trait_Model_rob <- robust(Trait_Model, cluster = Trait_Data$Study_ID, adjust = TRUE)
 
@@ -711,9 +713,9 @@ system.time(
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                    R = list(phylo=Class_A_cor), data = Class_Data, method = "REML", sparse = TRUE, 
                                    control=list(rel.tol=1e-9))
-    saveRDS(Class_Model, "./Complex_Class_Model.rds")
+    saveRDS(Class_Model, "./output/models/Complex_Class_Model.rds")
   } else {
-    Class_Model <- readRDS("./Complex_Class_Model.rds")})
+    Class_Model <- readRDS("./output/models/Complex_Class_Model.rds")})
 
 Class_Model_rob <- robust(Class_Model, cluster = Class_Data$Study_ID, adjust = TRUE)
 
@@ -994,9 +996,9 @@ system.time(
                                                           ~1|Shared_Animal_Number), 
                                             R = list(phylo=Specific_Trait_A_cor), data = Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                             control=list(rel.tol=1e-9))
-    saveRDS(Specific_Trait_Model, "./Complex_Specific_Trait_Model.rds")
+    saveRDS(Specific_Trait_Model, "./output/models/Complex_Specific_Trait_Model.rds")
   } else {
-    Specific_Trait_Model <- readRDS("./Complex_Specific_Trait_Model.rds")})
+    Specific_Trait_Model <- readRDS("./output/models/Complex_Specific_Trait_Model.rds")})
 
 Specific_Trait_Model_rob <- robust(Specific_Trait_Model, cluster = Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -1280,9 +1282,9 @@ system.time(
                                                       ~1|Shared_Animal_Number, ~1|Measurement), 
                                         R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE,
                                         control=list(rel.tol=1e-9))
-    saveRDS(Individual_Model, "./Complex_Individual_Model.rds")
+    saveRDS(Individual_Model, "./output/models/Complex_Individual_Model.rds")
   } else {
-    Individual_Model <- readRDS("./Complex_Individual_Model.rds")})
+    Individual_Model <- readRDS("./output/models/Complex_Individual_Model.rds")})
 
 Individual_Model_rob <- robust(Individual_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1299,9 +1301,9 @@ system.time(
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
                                                   R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE, 
                                                   control=list(rel.tol=1e-9))
-    saveRDS(Individual_Amplitude_Model, "./Complex_Individual_Amplitude_Model.rds")
+    saveRDS(Individual_Amplitude_Model, "./output/models/Complex_Individual_Amplitude_Model.rds")
   } else {
-    Individual_Amplitude_Model <- readRDS("./Complex_Individual_Amplitude_Model.rds")})
+    Individual_Amplitude_Model <- readRDS("./output/models/Complex_Individual_Amplitude_Model.rds")})
 
 Individual_Amplitude_Model_rob <- robust(Individual_Amplitude_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1372,9 +1374,9 @@ system.time(
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
                                                     R = list(phylo=Individual_Fluctuation_A_cor), data = Individual_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                     control=list(rel.tol=1e-9))
-    saveRDS(Individual_Fluctuation_Model, "./Complex_Individual_Fluctuation_Model.rds")
+    saveRDS(Individual_Fluctuation_Model, "./output/models/Complex_Individual_Fluctuation_Model.rds")
   } else {
-    Individual_Fluctuation_Model <- readRDS("./Complex_Individual_Fluctuation_Model.rds")})
+    Individual_Fluctuation_Model <- readRDS("./output/models/Complex_Individual_Fluctuation_Model.rds")})
 
 Individual_Fluctuation_Model_rob <- robust(Individual_Fluctuation_Model, cluster = Individual_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -1654,9 +1656,9 @@ system.time(
                                                             ~1|Shared_Animal_Number, ~1|Measurement), 
                                               R = list(phylo=Individual_Class_A_cor), data = Individual_Class_Data, method = "REML", sparse = TRUE, 
                                               control=list(rel.tol=1e-9))
-    saveRDS(Individual_Class_Model, "./Complex_Individual_Class_Model.rds")
+    saveRDS(Individual_Class_Model, "./output/models/Complex_Individual_Class_Model.rds")
   } else {
-    Individual_Class_Model <- readRDS("./Complex_Individual_Class_Model.rds")})
+    Individual_Class_Model <- readRDS("./output/models/Complex_Individual_Class_Model.rds")})
 
 Individual_Class_Model_rob <- robust(Individual_Class_Model, cluster = Individual_Class_Data$Study_ID, adjust = TRUE)
 
@@ -1901,9 +1903,9 @@ system.time(
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
                                      control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Model, "./Complex_Aquatic_Model.rds")
+    saveRDS(Aquatic_Model, "./output/models/Complex_Aquatic_Model.rds")
   } else {
-    Aquatic_Model <- readRDS("./Complex_Aquatic_Model.rds")})
+    Aquatic_Model <- readRDS("./output/models/Complex_Aquatic_Model.rds")})
 
 Aquatic_Model_rob <- robust(Aquatic_Model, cluster = Aquatic_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1920,9 +1922,9 @@ system.time(
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Amplitude_Model, "./Complex_Aquatic_Amplitude_Model.rds")
+    saveRDS(Aquatic_Amplitude_Model, "./output/models/Complex_Aquatic_Amplitude_Model.rds")
   } else {
-    Aquatic_Amplitude_Model <- readRDS("./Complex_Aquatic_Amplitude_Model.rds")})
+    Aquatic_Amplitude_Model <- readRDS("./output/models/Complex_Aquatic_Amplitude_Model.rds")})
 
 Aquatic_Amplitude_Model_rob <- robust(Aquatic_Amplitude_Model, cluster = Aquatic_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1994,9 +1996,9 @@ system.time(
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
                                                  R = list(phylo=Aquatic_Fluctuation_A_cor), data = Aquatic_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                  control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Fluctuation_Model, "./Complex_Aquatic_Fluctuation_Model.rds")
+    saveRDS(Aquatic_Fluctuation_Model, "./output/models/Complex_Aquatic_Fluctuation_Model.rds")
   } else {
-    Aquatic_Fluctuation_Model <- readRDS("./Complex_Aquatic_Fluctuation_Model.rds")})
+    Aquatic_Fluctuation_Model <- readRDS("./output/models/Complex_Aquatic_Fluctuation_Model.rds")})
 
 Aquatic_Fluctuation_Model_rob <- robust(Aquatic_Fluctuation_Model, cluster = Aquatic_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -2259,9 +2261,9 @@ system.time(
                                                          ~1|Shared_Animal_Number, ~1|Measurement), 
                                            R = list(phylo=Aquatic_Trait_A_cor), data = Aquatic_Trait_Data, method = "REML", sparse = TRUE, 
                                            control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Trait_Model, "./Complex_Aquatic_Trait_Model.rds")
+    saveRDS(Aquatic_Trait_Model, "./output/models/Complex_Aquatic_Trait_Model.rds")
   } else {
-    Aquatic_Trait_Model <- readRDS("./Complex_Aquatic_Trait_Model.rds")})
+    Aquatic_Trait_Model <- readRDS("./output/models/Complex_Aquatic_Trait_Model.rds")})
 
 Aquatic_Trait_Model_rob <- robust(Aquatic_Trait_Model, cluster = Aquatic_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -2509,9 +2511,9 @@ system.time(
                                                               ~1|Shared_Animal_Number, ~1|Measurement), 
                                                 R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
                                                 control=list(rel.tol=1e-9))
-    saveRDS(Aquatic_Plasticity_Model, "./Complex_Aquatic_Plasticity_Model.rds")
+    saveRDS(Aquatic_Plasticity_Model, "./output/models/Complex_Aquatic_Plasticity_Model.rds")
   } else {
-    Aquatic_Plasticity_Model <- readRDS("./Complex_Aquatic_Plasticity_Model.rds")})
+    Aquatic_Plasticity_Model <- readRDS("./output/models/Complex_Aquatic_Plasticity_Model.rds")})
 
 Aquatic_Plasticity_Model_rob <- robust(Aquatic_Plasticity_Model, cluster = Aquatic_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2756,9 +2758,9 @@ system.time(
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                          control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Model, "./Complex_Terrestrial_Model.rds")
+    saveRDS(Terrestrial_Model, "./output/models/Complex_Terrestrial_Model.rds")
   } else {
-    Terrestrial_Model <- readRDS("./Complex_Terrestrial_Model.rds")})
+    Terrestrial_Model <- readRDS("./output/models/Complex_Terrestrial_Model.rds")})
 
 Terrestrial_Model_rob <- robust(Terrestrial_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2775,9 +2777,9 @@ system.time(
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Amplitude_Model, "./Complex_Terrestrial_Amplitude_Model.rds")
+    saveRDS(Terrestrial_Amplitude_Model, "./output/models/Complex_Terrestrial_Amplitude_Model.rds")
   } else {
-    Terrestrial_Amplitude_Model <- readRDS("./Complex_Terrestrial_Amplitude_Model.rds")})
+    Terrestrial_Amplitude_Model <- readRDS("./output/models/Complex_Terrestrial_Amplitude_Model.rds")})
 
 Terrestrial_Amplitude_Model_rob <- robust(Terrestrial_Amplitude_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2848,9 +2850,9 @@ system.time(
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                                      R = list(phylo=Terrestrial_Fluctuation_A_cor), data = Terrestrial_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                      control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Fluctuation_Model, "./Complex_Terrestrial_Fluctuation_Model.rds")
+    saveRDS(Terrestrial_Fluctuation_Model, "./output/models/Complex_Terrestrial_Fluctuation_Model.rds")
   } else {
-    Terrestrial_Fluctuation_Model <- readRDS("./Complex_Terrestrial_Fluctuation_Model.rds")})
+    Terrestrial_Fluctuation_Model <- readRDS("./output/models/Complex_Terrestrial_Fluctuation_Model.rds")})
 
 Terrestrial_Fluctuation_Model_rob <- robust(Terrestrial_Fluctuation_Model, cluster = Terrestrial_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -3129,9 +3131,9 @@ system.time(
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Terrestrial_Trait_A_cor), data = Terrestrial_Trait_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Trait_Model, "./Complex_Terrestrial_Trait_Model.rds")
+    saveRDS(Terrestrial_Trait_Model, "./output/models/Complex_Terrestrial_Trait_Model.rds")
   } else {
-    Terrestrial_Trait_Model <- readRDS("./Complex_Terrestrial_Trait_Model.rds")})
+    Terrestrial_Trait_Model <- readRDS("./output/models/Complex_Terrestrial_Trait_Model.rds")})
 
 Terrestrial_Trait_Model_rob <- robust(Terrestrial_Trait_Model, cluster = Terrestrial_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -3415,9 +3417,9 @@ system.time(
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
                                                     R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                                     control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Plasticity_Model, "./Complex_Terrestrial_Plasticity_Model.rds")
+    saveRDS(Terrestrial_Plasticity_Model, "./output/models/Complex_Terrestrial_Plasticity_Model.rds")
   } else {
-    Terrestrial_Plasticity_Model <- readRDS("./Complex_Terrestrial_Plasticity_Model.rds")})
+    Terrestrial_Plasticity_Model <- readRDS("./output/models/Complex_Terrestrial_Plasticity_Model.rds")})
 
 Terrestrial_Plasticity_Model_rob <- robust(Terrestrial_Plasticity_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -3678,9 +3680,9 @@ system.time(
                                                                       ~1|Shared_Animal_Number), 
                                                         R = list(phylo=Terrestrial_Specific_Trait_A_cor), data = Terrestrial_Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                                         control=list(rel.tol=1e-9))
-    saveRDS(Terrestrial_Specific_Trait_Model, "./Complex_Terrestrial_Specific_Trait_Model.rds")
+    saveRDS(Terrestrial_Specific_Trait_Model, "./output/models/Complex_Terrestrial_Specific_Trait_Model.rds")
   } else {
-    Terrestrial_Specific_Trait_Model <- readRDS("./Complex_Terrestrial_Specific_Trait_Model.rds")})
+    Terrestrial_Specific_Trait_Model <- readRDS("./output/models/Complex_Terrestrial_Specific_Trait_Model.rds")})
 
 Terrestrial_Specific_Trait_Model_rob <- robust(Terrestrial_Specific_Trait_Model, cluster = Terrestrial_Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -3943,9 +3945,9 @@ system.time(
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
                                          control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Model, "./Complex_Acclimation_Model.rds")
+    saveRDS(Acclimation_Model, "./output/models/Complex_Acclimation_Model.rds")
   } else {
-    Acclimation_Model <- readRDS("./Complex_Acclimation_Model.rds")})
+    Acclimation_Model <- readRDS("./output/models/Complex_Acclimation_Model.rds")})
 
 Acclimation_Model_rob <- robust(Acclimation_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -3962,9 +3964,9 @@ system.time(
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Amplitude_Model, "./Complex_Acclimation_Amplitude_Model.rds")
+    saveRDS(Acclimation_Amplitude_Model, "./output/models/Complex_Acclimation_Amplitude_Model.rds")
   } else {
-    Acclimation_Amplitude_Model <- readRDS("./Complex_Acclimation_Amplitude_Model.rds")})
+    Acclimation_Amplitude_Model <- readRDS("./output/models/Complex_Acclimation_Amplitude_Model.rds")})
 
 Acclimation_Amplitude_Model_rob <- robust(Acclimation_Amplitude_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -4012,9 +4014,9 @@ system.time(
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
                                                   R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
                                                   control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Exposure_Model, "./Complex_Acclimation_Exposure_Model.rds")
+    saveRDS(Acclimation_Exposure_Model, "./output/models/Complex_Acclimation_Exposure_Model.rds")
   } else {
-    Acclimation_Exposure_Model <- readRDS("./Complex_Acclimation_Exposure_Model.rds")})
+    Acclimation_Exposure_Model <- readRDS("./output/models/Complex_Acclimation_Exposure_Model.rds")})
 
 Acclimation_Exposure_Model_rob <- robust(Acclimation_Exposure_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -4071,9 +4073,9 @@ system.time(
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Acclimation_Frequency_A_cor), data = Acclimation_Frequency_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Frequency_Model, "./Complex_Acclimation_Frequency_Model.rds")
+    saveRDS(Acclimation_Frequency_Model, "./output/models/Complex_Acclimation_Frequency_Model.rds")
   } else {
-    Acclimation_Frequency_Model <- readRDS("./Complex_Acclimation_Frequency_Model.rds")})
+    Acclimation_Frequency_Model <- readRDS("./output/models/Complex_Acclimation_Frequency_Model.rds")})
 
 Acclimation_Frequency_Model_rob <- robust(Acclimation_Frequency_Model, cluster = Acclimation_Frequency_Data$Study_ID, adjust = TRUE)
 
@@ -4145,9 +4147,9 @@ system.time(
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                                      R = list(phylo=Acclimation_Fluctuation_A_cor), data = Acclimation_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                      control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Fluctuation_Model, "./Complex_Acclimation_Fluctuation_Model.rds")
+    saveRDS(Acclimation_Fluctuation_Model, "./output/models/Complex_Acclimation_Fluctuation_Model.rds")
   } else {
-    Acclimation_Fluctuation_Model <- readRDS("./Complex_Acclimation_Fluctuation_Model.rds")})
+    Acclimation_Fluctuation_Model <- readRDS("./output/models/Complex_Acclimation_Fluctuation_Model.rds")})
 
 Acclimation_Fluctuation_Model_rob <- robust(Acclimation_Fluctuation_Model, cluster = Acclimation_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -4409,9 +4411,9 @@ system.time(
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Acclimation_Trait_A_cor), data = Acclimation_Trait_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Trait_Model, "./Complex_Acclimation_Trait_Model.rds")
+    saveRDS(Acclimation_Trait_Model, "./output/models/Complex_Acclimation_Trait_Model.rds")
   } else {
-    Acclimation_Trait_Model <- readRDS("./Complex_Acclimation_Trait_Model.rds")})
+    Acclimation_Trait_Model <- readRDS("./output/models/Complex_Acclimation_Trait_Model.rds")})
 
 Acclimation_Trait_Model_rob <- robust(Acclimation_Trait_Model, cluster = Acclimation_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -4669,9 +4671,9 @@ system.time(
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Acclimation_Stage_A_cor), data = Acclimation_Stage_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Stage_Model, "./Complex_Acclimation_Stage_Model.rds")
+    saveRDS(Acclimation_Stage_Model, "./output/models/Complex_Acclimation_Stage_Model.rds")
   } else {
-    Acclimation_Stage_Model <- readRDS("./Complex_Acclimation_Stage_Model.rds")})
+    Acclimation_Stage_Model <- readRDS("./output/models/Complex_Acclimation_Stage_Model.rds")})
 
 Acclimation_Stage_Model_rob <- robust(Acclimation_Stage_Model, cluster = Acclimation_Stage_Data$Study_ID, adjust = TRUE)
 
@@ -4949,9 +4951,9 @@ system.time(
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Acclimation_Class_A_cor), data = Acclimation_Class_Data, method = "REML", sparse = TRUE, 
                                                control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Class_Model, "./Complex_Acclimation_Class_Model.rds")
+    saveRDS(Acclimation_Class_Model, "./output/models/Complex_Acclimation_Class_Model.rds")
   } else {
-    Acclimation_Class_Model <- readRDS("./Complex_Acclimation_Class_Model.rds")})
+    Acclimation_Class_Model <- readRDS("./output/models/Complex_Acclimation_Class_Model.rds")})
 
 Acclimation_Class_Model_rob <- robust(Acclimation_Class_Model, cluster = Acclimation_Class_Data$Study_ID, adjust = TRUE)
 
@@ -5061,9 +5063,9 @@ system.time(
                                                                       ~1|Shared_Animal_Number), 
                                                         R = list(phylo=Acclimation_Specific_Trait_A_cor), data = Acclimation_Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                                         control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Specific_Trait_Model, "./Complex_Acclimation_Specific_Trait_Model.rds")
+    saveRDS(Acclimation_Specific_Trait_Model, "./output/models/Complex_Acclimation_Specific_Trait_Model.rds")
   } else {
-    Acclimation_Specific_Trait_Model <- readRDS("./Complex_Acclimation_Specific_Trait_Model.rds")})
+    Acclimation_Specific_Trait_Model <- readRDS("./output/models/Complex_Acclimation_Specific_Trait_Model.rds")})
 
 Acclimation_Specific_Trait_Model_rob <- robust(Acclimation_Specific_Trait_Model, cluster = Acclimation_Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -5159,9 +5161,9 @@ system.time(
                                                          ~1|Shared_Animal_Number, ~1|Measurement), 
                                            R = list(phylo=Developmental_A_cor), data = Developmental_Subset_Data, method = "REML", sparse = TRUE, 
                                            control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Model, "./Complex_Developmental_Model.rds")
+    saveRDS(Developmental_Model, "./output/models/Complex_Developmental_Model.rds")
   } else {
-    Developmental_Model <- readRDS("./Complex_Developmental_Model.rds")})
+    Developmental_Model <- readRDS("./output/models/Complex_Developmental_Model.rds")})
 
 Developmental_Model_rob <- robust(Developmental_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -5178,9 +5180,9 @@ system.time(
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                                      R = list(phylo=Developmental_A_cor), data = Developmental_Subset_Data, method = "REML", sparse = TRUE, 
                                                      control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Amplitude_Model, "./Complex_Developmental_Amplitude_Model.rds")
+    saveRDS(Developmental_Amplitude_Model, "./output/models/Complex_Developmental_Amplitude_Model.rds")
   } else {
-    Developmental_Amplitude_Model <- readRDS("./Complex_Developmental_Amplitude_Model.rds")})
+    Developmental_Amplitude_Model <- readRDS("./output/models/Complex_Developmental_Amplitude_Model.rds")})
 
 Developmental_Amplitude_Model_rob <- robust(Developmental_Amplitude_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -5250,9 +5252,9 @@ system.time(
                                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
                                                        R = list(phylo=Developmental_Fluctuation_A_cor), data = Developmental_Fluctuation_Data, method = "REML", sparse = TRUE, 
                                                        control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Fluctuation_Model, "./Complex_Developmental_Fluctuation_Model.rds")
+    saveRDS(Developmental_Fluctuation_Model, "./output/models/Complex_Developmental_Fluctuation_Model.rds")
   } else {
-    Developmental_Fluctuation_Model <- readRDS("./Complex_Developmental_Fluctuation_Model.rds")})
+    Developmental_Fluctuation_Model <- readRDS("./output/models/Complex_Developmental_Fluctuation_Model.rds")})
 
 Developmental_Fluctuation_Model_rob <- robust(Developmental_Fluctuation_Model, cluster = Developmental_Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -5533,9 +5535,9 @@ system.time(
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
                                                  R = list(phylo=Developmental_Trait_A_cor), data = Developmental_Trait_Data, method = "REML", sparse = TRUE, 
                                                  control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Trait_Model, "./Complex_Developmental_Trait_Model.rds")
+    saveRDS(Developmental_Trait_Model, "./output/models/Complex_Developmental_Trait_Model.rds")
   } else {
-    Developmental_Trait_Model <- readRDS("./Complex_Developmental_Trait_Model.rds")})
+    Developmental_Trait_Model <- readRDS("./output/models/Complex_Developmental_Trait_Model.rds")})
 
 Developmental_Trait_Model_rob <- robust(Developmental_Trait_Model, cluster = Developmental_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -5784,9 +5786,9 @@ system.time(
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
                                                     R = list(phylo=Developmental_A_cor), data = Developmental_Subset_Data, method = "REML", sparse = TRUE, 
                                                     control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Exposure_Model, "./Complex_Developmental_Exposure_Model.rds")
+    saveRDS(Developmental_Exposure_Model, "./output/models/Complex_Developmental_Exposure_Model.rds")
   } else {
-    Developmental_Exposure_Model <- readRDS("./Complex_Developmental_Exposure_Model.rds")})
+    Developmental_Exposure_Model <- readRDS("./output/models/Complex_Developmental_Exposure_Model.rds")})
 
 Developmental_Exposure_Model_rob <- robust(Developmental_Exposure_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -6065,9 +6067,9 @@ system.time(
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
                                                  R = list(phylo=Developmental_Class_A_cor), data = Developmental_Class_Data, method = "REML", sparse = TRUE, 
                                                  control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Class_Model, "./Complex_Developmental_Class_Model.rds")
+    saveRDS(Developmental_Class_Model, "./output/models/Complex_Developmental_Class_Model.rds")
   } else {
-    Developmental_Class_Model <- readRDS("./Complex_Developmental_Class_Model.rds")})
+    Developmental_Class_Model <- readRDS("./output/models/Complex_Developmental_Class_Model.rds")})
 
 Developmental_Class_Model_rob <- robust(Developmental_Class_Model, cluster = Developmental_Class_Data$Study_ID, adjust = TRUE)
 
@@ -6329,9 +6331,9 @@ system.time(
                                                                         ~1|Shared_Animal_Number), 
                                                           R = list(phylo=Developmental_Specific_Trait_A_cor), data = Developmental_Specific_Trait_Data, method = "REML", sparse = TRUE, 
                                                           control=list(rel.tol=1e-9))
-    saveRDS(Developmental_Specific_Trait_Model, "./Complex_Developmental_Specific_Trait_Model.rds")
+    saveRDS(Developmental_Specific_Trait_Model, "./output/models/Complex_Developmental_Specific_Trait_Model.rds")
   } else {
-    Developmental_Specific_Trait_Model <- readRDS("./Complex_Developmental_Specific_Trait_Model.rds")})
+    Developmental_Specific_Trait_Model <- readRDS("./output/models/Complex_Developmental_Specific_Trait_Model.rds")})
 
 Developmental_Specific_Trait_Model_rob <- robust(Developmental_Specific_Trait_Model, cluster = Developmental_Specific_Trait_Data$Study_ID, adjust = TRUE)
 
