@@ -9,7 +9,7 @@ pacman::p_load(tidyverse, readxl, gtsummary, dplyr,
                tidyr, ggplot2, rotl, DescTools, stringr, ape, 
                emmeans, patchwork, latex2exp, metafor, brms, 
                flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
-               robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra)
+               robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
 
 # Importing Data Set
 data <- read.csv("./Complex_Final_Data.csv")
@@ -26,6 +26,10 @@ A_cor <- ape::vcv.phylo(phy, corr = TRUE)
 
 # Variance Matrix (Shared Control)
 VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
+
+# Periods used in different studies 
+ sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
+                                                                  per = n/44*100) 
 
 ##### Overall Model #####
 run <- TRUE
