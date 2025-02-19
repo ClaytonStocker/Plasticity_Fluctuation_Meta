@@ -49,7 +49,7 @@ run <- TRUE
 system.time(
   if(run){
     Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = VCV, test = "t", dfs = "contain",
-                                       mods = ~ Fluctuation_Magnitude - 1,
+                                       mods = ~ Fluctuation_Magnitude,
                                        random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
                                        R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
