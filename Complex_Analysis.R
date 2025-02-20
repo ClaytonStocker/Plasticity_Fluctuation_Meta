@@ -242,7 +242,7 @@ my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(
                               legend.position = "top"))
                         }
 
-density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45) + ylim(-0.2, 0.2) + 
+density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2,3)+0.1, y = 0.18,
                        label= paste("italic(k)==", c(fluctuation_table["Alternating", "K"],
@@ -404,7 +404,7 @@ density_trait <- trait_table %>% mutate(name = fct_relevel(name, Trait_Order)) %
 density_trait
 
 ## ORCHARD PLOT VERSION ##
-density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45) + ylim(-0.2, 0.2) + 
+density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2,3,4)+0.1, y = 0.18, label = 
                        paste("italic(k)==", c(trait_table["Biochemical Assay", "K"], 
@@ -563,7 +563,7 @@ density_class
 
 ### OCHARD PLOT VERSION ###
 
-density_class_orchard <- orchard_plot(Class_Model, group = "Study_ID", mod = "Class", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45) + ylim(-0.2, 0.2) + 
+density_class_orchard <- orchard_plot(Class_Model, group = "Study_ID", mod = "Class", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2,3)+0.1, y = 0.18, label= paste("italic(k)==", c(class_table["Arachnida", "K"], 
                                                class_table["Insecta", "K"], 
@@ -726,163 +726,27 @@ density_specific_trait <- specific_trait_table %>% mutate(name = fct_relevel(nam
 
 density_specific_trait
 
-# Preparing Graph - Part 1
+### ORCHARD PLOT VERSION ###
 
-specific_trait_rnames_1 <- c("Development Time", "Length")
+density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2,3,4)+0.1, y = 0.18, label= paste("italic(k)==", c(specific_trait_table["Development Time", "K"],
+                                              specific_trait_table["Length", "K"],
+                                              specific_trait_table["Mass", "K"],
+                                              specific_trait_table["Metabolic Rate", "K"]), "~","(", 
+                                                      c(specific_trait_table["Development Time", "group_no"],
+                                              specific_trait_table["Length", "group_no"],
+                                              specific_trait_table["Mass", "group_no"],
+                                              specific_trait_table["Metabolic Rate", "group_no"]), 
+                                       ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Development Time", "estimate"])-1)*100, 2), nsmall = 2), "%"), paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Length", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                  paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Mass", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Metabolic Rate", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
-specific_trait_k_1 <- data.frame("k" = c(Specific_Trait_Exploration["Development Time", "Freq"], 
-                                         Specific_Trait_Exploration["Length", "Freq"]), 
-                                 row.names = specific_trait_rnames_1)
+  ggsave(filename = "./output/figs/fig5.png", density_specific_trait_orchard, width = 8.679012, height =  8.049383)
 
-specific_trait_group_no_1 <- data.frame("Spp No." = c(Specific_Trait_Species_Count["Development Time", "Freq"], 
-                                                      Specific_Trait_Species_Count["Length", "Freq"]), 
-                                        row.names = specific_trait_rnames_1)
-
-specific_trait_study_1 <- data.frame("Study" = c(Specific_Trait_Study_Count["Development Time", "Freq"], 
-                                                 Specific_Trait_Study_Count["Length", "Freq"]), 
-                                     row.names = specific_trait_rnames_1)
-
-Specific_Trait_Model_Estimates_Reorder_1 <- Specific_Trait_Model_Estimates[c("Development Time", "Length"), ]
-
-specific_trait_table_1 <- data.frame(estimate = Specific_Trait_Model_Estimates_Reorder_1[,"estimate"], 
-                                     lowerCL = Specific_Trait_Model_Estimates_Reorder_1[,"ci.lb"], 
-                                     upperCL = Specific_Trait_Model_Estimates_Reorder_1[,"ci.ub"], 
-                                     K = specific_trait_k_1[,1], 
-                                     group_no = specific_trait_group_no_1[,1], 
-                                     row.names = specific_trait_rnames_1)
-specific_trait_table_1$name <- row.names(specific_trait_table_1)
-
-specific_trait_raw_mean_1 <- c(unlist(unname(Specific_Trait_Data %>% filter(`Measurement` == "Development Time") %>% 
-                                             select("InRR_Transformed"))), 
-                               unlist(unname(Specific_Trait_Data %>% filter(`Measurement` == "Length") %>% 
-                                             select("InRR_Transformed"))))
-
-specific_trait_raw_name_1 <- c(replicate(46, "Development Time"), 
-                               replicate(14, "Length"))
-
-specific_trait_raw_df_1 <- data.frame("Model" = specific_trait_raw_name_1, 
-                                      "Effect" = specific_trait_raw_mean_1)
-
-# Graph code - Part 1
-
-Specific_Trait_Order_1 <- c("Length", "Development Time")
-
-density_specific_trait_1 <- specific_trait_table_1 %>% mutate(name = fct_relevel(name, Specific_Trait_Order_1)) %>%
-                            ggplot() +
-                            geom_density_ridges(data = specific_trait_raw_df_1 %>% mutate(Model = fct_relevel(Model, Specific_Trait_Order_1)), 
-                                                aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                    scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                            geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table_1)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                           size = 1) +
-                            geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table_1)[1], 1)), xmin = min(specific_trait_raw_df_1$Effect)-0.01, xmax = -1.5, colour = name),
-                                           size = 1) +
-                            geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table_1)[1], 1)), xmin = max(specific_trait_raw_df_1$Effect)+0.01, xmax = 1.5, colour = name),
-                                           size = 1) +
-                            geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(specific_trait_table_1)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                            size = 1, fatten = 2) +
-                            theme_bw() +
-                            guides(fill = "none", colour = "none") +
-                            labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                            theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                             vjust = c(-2.7, -0.8))) +
-                            theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                            theme(axis.ticks = element_blank()) +
-                            theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                            theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                            scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                            scale_colour_manual(values = c("#3C5F8D", "#2B4E7A")) +
-                            scale_fill_manual(values = c("#3C5F8D", "#2B4E7A")) +
-                            coord_cartesian(xlim = c(-0.5, 0.5)) +
-                            annotate('text',  x = 0.5, y = (seq(1, dim(specific_trait_table_1)[1], 1)+0.4),
-                            label= paste("italic(k)==", c(specific_trait_table_1["Length", "K"], 
-                                                          specific_trait_table_1["Development Time", "K"]), "~","(", 
-                                                        c(specific_trait_table_1["Length", "group_no"], 
-                                                          specific_trait_table_1["Development Time", "group_no"]), 
-                                         ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                             geom_label(aes(label=c(paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Length", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Development Time", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                        x = -0.4, y = (seq(1, dim(specific_trait_table_1)[1], 1)+0.4)), size = 3.5)
-
-density_specific_trait_1
-
-# Preparing Graph - Part 2
-
-specific_trait_rnames_2 <- c("Mass", "Metabolic Rate")
-
-specific_trait_k_2 <- data.frame("k" = c(Specific_Trait_Exploration["Mass", "Freq"], 
-                                         Specific_Trait_Exploration["Metabolic Rate", "Freq"]), 
-                                 row.names = specific_trait_rnames_2)
-
-specific_trait_group_no_2 <- data.frame("Spp No." = c(Specific_Trait_Species_Count["Mass", "Freq"], 
-                                                      Specific_Trait_Species_Count["Metabolic Rate", "Freq"]), 
-                                        row.names = specific_trait_rnames_2)
-
-specific_trait_study_2 <- data.frame("Study" = c(Specific_Trait_Study_Count["Mass", "Freq"], 
-                                                 Specific_Trait_Study_Count["Metabolic Rate", "Freq"]), 
-                                     row.names = specific_trait_rnames_2)
-
-Specific_Trait_Model_Estimates_Reorder_2 <- Specific_Trait_Model_Estimates[c("Mass", "Metabolic Rate"), ]
-
-specific_trait_table_2 <- data.frame(estimate = Specific_Trait_Model_Estimates_Reorder_2[,"estimate"], 
-                                     lowerCL = Specific_Trait_Model_Estimates_Reorder_2[,"ci.lb"], 
-                                     upperCL = Specific_Trait_Model_Estimates_Reorder_2[,"ci.ub"], 
-                                     K = specific_trait_k_2[,1], 
-                                     group_no = specific_trait_group_no_2[,1], 
-                                     row.names = specific_trait_rnames_2)
-specific_trait_table_2$name <- row.names(specific_trait_table_2)
-
-specific_trait_raw_mean_2 <- c(unlist(unname(Specific_Trait_Data %>% filter(`Measurement` == "Mass") %>% 
-                                             select("InRR_Transformed"))), 
-                               unlist(unname(Specific_Trait_Data %>% filter(`Measurement` == "Metabolic Rate") %>% 
-                                             select("InRR_Transformed"))))
-
-specific_trait_raw_name_2 <- c(replicate(25, "Mass"), 
-                               replicate(12, "Metabolic Rate"))
-
-specific_trait_raw_df_2 <- data.frame("Model" = specific_trait_raw_name_2, 
-                                      "Effect" = specific_trait_raw_mean_2)
-
-# Graph code - Part 2
-
-Specific_Trait_Order_2 <- c("Metabolic Rate", "Mass")
-
-density_specific_trait_2 <- specific_trait_table_2 %>% mutate(name = fct_relevel(name, Specific_Trait_Order_2)) %>%
-                            ggplot() +
-                            geom_density_ridges(data = specific_trait_raw_df_2 %>% mutate(Model = fct_relevel(Model, Specific_Trait_Order_2)), 
-                                                aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                    scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                            geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table_2)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                           size = 1) +
-                            geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table_2)[1], 1)), xmin = min(specific_trait_raw_df_2$Effect)-0.01, xmax = -1.5, colour = name),
-                                           size = 1) +
-                            geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table_2)[1], 1)), xmin = max(specific_trait_raw_df_2$Effect)+0.02, xmax = 1.5, colour = name),
-                                           size = 1) +
-                            geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(specific_trait_table_2)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                            size = 1, fatten = 2) +
-                            theme_bw() +
-                            guides(fill = "none", colour = "none") +
-                            labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                            theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                             vjust = c(-0.8, -2.7))) +
-                            theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                            theme(axis.ticks = element_blank()) +
-                            theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                            theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                            scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                            scale_colour_manual(values = c("#5D7AA1", "#4A6E9C")) +
-                            scale_fill_manual(values = c("#5D7AA1", "#4A6E9C")) +
-                            coord_cartesian(xlim = c(-0.5, 0.5)) +
-                            annotate('text',  x = 0.5, y = (seq(1, dim(specific_trait_table_2)[1], 1)+0.4),
-                            label= paste("italic(k)==", c(specific_trait_table_2["Metabolic Rate", "K"], 
-                                                          specific_trait_table_2["Mass", "K"]), "~","(", 
-                                                        c(specific_trait_table_2["Metabolic Rate", "group_no"], 
-                                                          specific_trait_table_2["Mass", "group_no"]), 
-                                         ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                             geom_label(aes(label=c(paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Metabolic Rate", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Mass", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                        x = -0.4, y = (seq(1, dim(specific_trait_table_2)[1], 1)+0.4)), size = 3.5)
-
-density_specific_trait_2
+#### -------------------------------------------- ####
 
 ##### Individual-Level Trait Subset Model #####
 Individual_Subset_Data <- data %>% filter(Trait_Category != "Population")
