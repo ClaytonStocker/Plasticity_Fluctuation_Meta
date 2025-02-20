@@ -424,7 +424,7 @@ density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Tr
 
   ggsave(filename = "./output/figs/fig4.png", density_trait_orchard, width = 8.679012, height =  8.049383)
 
-
+#### -------------------------------------------- ####
 ##### Overall Model - Class Meta-Regression #####
 Class_Exploration <- data %>% select("Class") %>% table() %>% data.frame()
 rownames(Class_Exploration) <- Class_Exploration$Class
@@ -561,154 +561,25 @@ density_class <- class_table %>% mutate(name = fct_relevel(name, Class_Order)) %
 
 density_class
 
-# Preparing Graph - Part 1
+### OCHARD PLOT VERSION ###
 
-class_rnames_1 <- c("Arachnida", "Insecta")
+density_class_orchard <- orchard_plot(Class_Model, group = "Study_ID", mod = "Class", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2,3)+0.1, y = 0.18, label= paste("italic(k)==", c(class_table["Arachnida", "K"], 
+                                               class_table["Insecta", "K"], 
+                                               class_table["Malacostraca", "K"]), "~","(", 
+                                             c(class_table["Arachnida", "group_no"], 
+                                               class_table["Insecta", "group_no"], 
+                                               class_table["Malacostraca", "group_no"]), ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(paste(format(round(mean(exp(Class_Model_Estimates["Arachnida", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                        paste(format(round(mean(exp(Class_Model_Estimates["Insecta", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                                        paste(format(round(mean(exp(Class_Model_Estimates["Malacostraca", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
-class_k_1 <- data.frame("k" = c(Class_Exploration["Arachnida", "Freq"], 
-                                Class_Exploration["Insecta", "Freq"]), 
-                        row.names = class_rnames_1)
+  ggsave(filename = "./output/figs/fig6.png", density_class_orchard, width = 8.679012, height =  8.049383)
 
-class_group_no_1 <- data.frame("Spp No." = c(Class_Species_Count["Arachnida", "Freq"],
-                                             Class_Species_Count["Insecta", "Freq"]), 
-                               row.names = class_rnames_1)
+####--------------------------------------------####
 
-class_study_1 <- data.frame("Study" = c(Class_Study_Count["Arachnida", "Freq"],
-                                        Class_Study_Count["Insecta", "Freq"]), 
-                            row.names = class_rnames_1)
-
-Class_Model_Estimates_Reorder_1 <- Class_Model_Estimates[c("Arachnida", "Insecta"), ]
-
-class_table_1 <- data.frame(estimate = Class_Model_Estimates_Reorder_1[,"estimate"], 
-                            lowerCL = Class_Model_Estimates_Reorder_1[,"ci.lb"], 
-                            upperCL = Class_Model_Estimates_Reorder_1[,"ci.ub"], 
-                            K = class_k_1[,1], 
-                            group_no = class_group_no_1[,1], 
-                            row.names = class_rnames_1)
-class_table_1$name <- row.names(class_table_1)
-
-class_raw_mean_1 <- c(unlist(unname(Class_Data %>% filter(`Class` == "Arachnida") %>% 
-                                    select("InRR_Transformed"))), 
-                      unlist(unname(Class_Data %>% filter(`Class` == "Insecta") %>% 
-                                    select("InRR_Transformed"))))
-
-class_raw_name_1 <- c(replicate(11, "Arachnida"), 
-                      replicate(108, "Insecta"))
-
-class_raw_df_1 <- data.frame("Model" = class_raw_name_1, 
-                             "Effect" = class_raw_mean_1)
-
-# Graph code - Part 1
-
-Class_Order_1 <- c("Insecta", "Arachnida")
-
-density_class_1 <- class_table_1 %>% mutate(name = fct_relevel(name, Class_Order_1)) %>%
-                   ggplot() +
-                   geom_density_ridges(data = class_raw_df_1 %>% mutate(Model = fct_relevel(Model, Class_Order_1)), 
-                                       aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                           scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                   geom_linerange(aes(y = rev(seq(1, dim(class_table_1)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                  size = 1) +
-                   geom_linerange(aes(y = rev(seq(1, dim(class_table_1)[1], 1)), xmin = min(class_raw_df_1$Effect)-0.02, xmax = -1.5, colour = name),
-                                  size = 1) +
-                   geom_linerange(aes(y = rev(seq(1, dim(class_table_1)[1], 1)), xmin = max(class_raw_df_1$Effect)+0.02, xmax = 1.5, colour = name),
-                                  size = 1) +
-                   geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(class_table_1)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                   size = 1, fatten = 2) +
-                   theme_bw() +
-                   guides(fill = "none", colour = "none") +
-                   labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                   theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                    vjust = c(-2.7, -2.7))) +
-                   theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                   theme(axis.ticks = element_blank()) +
-                   theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                   theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                   scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                   scale_colour_manual(values = c("#4A6E9C", "#2B4E7A")) +
-                   scale_fill_manual(values = c("#4A6E9C", "#2B4E7A")) +
-                   coord_cartesian(xlim = c(-0.5, 0.5)) +
-                   annotate('text',  x = 0.5, y = (seq(1, dim(class_table_1)[1], 1)+0.4),
-                   label= paste("italic(k)==", c(class_table_1["Insecta", "K"], 
-                                                 class_table_1["Arachnida", "K"]), "~","(", 
-                                               c(class_table_1["Insecta", "group_no"], 
-                                                 class_table_1["Arachnida", "group_no"]), 
-                                ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                    geom_label(aes(label=c(paste(format(round(mean(exp(Class_Model_Estimates["Insecta", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                           paste(format(round(mean(exp(Class_Model_Estimates["Arachnida", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                               x = -0.4, y = (seq(1, dim(class_table_1)[1], 1)+0.4)), size = 3.5)
-
-density_class_1
-
-# Preparing Graph - Part 2
-
-class_rnames_2 <- c("Malacostraca")
-
-class_k_2 <- data.frame("k" = c(Class_Exploration["Malacostraca", "Freq"]), 
-                        row.names = class_rnames_2)
-
-class_group_no_2 <- data.frame("Spp No." = c(Class_Species_Count["Malacostraca", "Freq"]), 
-                               row.names = class_rnames_2)
-
-class_study_2 <- data.frame("Study" = c(Class_Study_Count["Malacostraca", "Freq"]), 
-                            row.names = class_rnames_2)
-
-Class_Model_Estimates_Reorder_2 <- Class_Model_Estimates[c("Malacostraca"), ]
-
-class_table_2 <- data.frame(estimate = Class_Model_Estimates_Reorder_2[,"estimate"], 
-                            lowerCL = Class_Model_Estimates_Reorder_2[,"ci.lb"], 
-                            upperCL = Class_Model_Estimates_Reorder_2[,"ci.ub"], 
-                            K = class_k_2[,1], 
-                            group_no = class_group_no_2[,1], 
-                            row.names = class_rnames_2)
-class_table_2$name <- row.names(class_table_2)
-
-class_raw_mean_2 <- c(unlist(unname(Class_Data %>% filter(`Class` == "Malacostraca") %>% 
-                                    select("InRR_Transformed"))))
-
-class_raw_name_2 <- c(replicate(11, "Malacostraca"))
-
-class_raw_df_2 <- data.frame("Model" = class_raw_name_2, 
-                             "Effect" = class_raw_mean_2)
-
-# Graph code - Part 2
-
-Class_Order_2 <- c("Malacostraca")
-
-density_class_2 <- class_table_2 %>% mutate(name = fct_relevel(name, Class_Order_2)) %>%
-                   ggplot() +
-                   geom_density_ridges(data = class_raw_df_2 %>% mutate(Model = fct_relevel(Model, Class_Order_2)), 
-                                       aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                           scale = 0.015, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                   geom_linerange(aes(y = rev(seq(1, dim(class_table_2)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                  size = 1) +
-                   geom_linerange(aes(y = rev(seq(1, dim(class_table_2)[1], 1)), xmin = min(class_raw_df_2$Effect)-0.01, xmax = -1.5, colour = name),
-                                  size = 1) +
-                   geom_linerange(aes(y = rev(seq(1, dim(class_table_2)[1], 1)), xmin = max(class_raw_df_2$Effect)+0.01, xmax = 1.5, colour = name),
-                                  size = 1) +
-                   geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(class_table_2)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                   size = 1, fatten = 2) +
-                   theme_bw() +
-                   guides(fill = "none", colour = "none") +
-                   labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                   theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                    vjust = c(-2.7))) +
-                   theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                   theme(axis.ticks = element_blank()) +
-                   theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                   theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                   scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                   scale_colour_manual(values = c("#5D7AA1")) +
-                   scale_fill_manual(values = c("#5D7AA1")) +
-                   coord_cartesian(xlim = c(-0.5, 0.5)) +
-                   annotate('text',  x = 0.5, y = (seq(1, dim(class_table_2)[1], 1)+0.4),
-                   label= paste("italic(k)==", c(class_table_2["Malacostraca", "K"]), "~","(", 
-                                               c(class_table_2["Malacostraca", "group_no"]), 
-                                ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                    geom_label(aes(label=c(paste(format(round(mean(exp(Class_Model_Estimates["Malacostraca", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                               x = -0.4, y = (seq(1, dim(class_table_2)[1], 1)+0.4)), size = 3.5)
-
-density_class_2
 
 ##### Overall Model - Specific Trait Meta-Regression #####
 Specific_Trait_Exploration <- data %>% select("Measurement") %>% table() %>% data.frame()
