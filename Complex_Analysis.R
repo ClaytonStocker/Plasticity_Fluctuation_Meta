@@ -191,36 +191,6 @@ fluctuation_raw_df <- data.frame("Model" = fluctuation_raw_name,
 
 Fluctuation_Order <- c("Stepwise", "Alternating", "Sinusoidal (Sine Curve)")
 
-#### ORCHARD PLOT VERSIONS ####
-# Figure 7 in main paper
-my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
-                              axis.text.x = element_text(margin = margin(b = 5), size = 16), 
-                              axis.ticks = element_blank(),
-                              axis.title = element_text(size = 18),
-                              legend.title = element_text(size = 16),
-                              legend.text = element_text(size = 16), 
-                              legend.position = "top"))
-                        }
-
-density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45) + ylim(-0.2, 0.2) + 
-                  my_theme() + 
-                  annotate('text',  x = c(1,2,3)+0.1, y = 0.18,
-                       label= paste("italic(k)==", c(fluctuation_table["Alternating", "K"],
-                                                     fluctuation_table["Sinusoidal (Sine Curve)", "K"], 
-                                                     fluctuation_table["Stepwise", "K"]), "~","(", 
-                                                   c(fluctuation_table["Alternating", "group_no"],
-                                                    fluctuation_table["Sinusoidal (Sine Curve)","group_no"], 
-                                                     fluctuation_table["Stepwise", "group_no"]), 
-                                    ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label=c(paste(format(round(mean(exp(Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                  paste(format(round(mean(exp(Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                  paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                 x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
-
-  ggsave(filename = "./output/figs/fig7.png", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
-##-------------------------------##
-
-### OLDER VERSIONS ###
 density_fluctuation <- fluctuation_table %>% mutate(name = fct_relevel(name, Fluctuation_Order)) %>%
                        ggplot() +
                        geom_density_ridges(data = fluctuation_raw_df %>% mutate(Model = fct_relevel(Model, Fluctuation_Order)), 
@@ -261,154 +231,35 @@ density_fluctuation <- fluctuation_table %>% mutate(name = fct_relevel(name, Flu
                                       x = -0.4, y = (seq(1, dim(fluctuation_table)[1], 1)+0.4)), size = 3.5)
 density_fluctuation
 
-# Preparing Graph - Part 1
+#### ORCHARD PLOT VERSION ####
+# Figure 7 in main paper
+my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
+                              axis.text.x = element_text(margin = margin(b = 5), size = 16), 
+                              axis.ticks = element_blank(),
+                              axis.title = element_text(size = 18),
+                              legend.title = element_text(size = 16),
+                              legend.text = element_text(size = 16), 
+                              legend.position = "top"))
+                        }
 
-fluctuation_rnames_1 <- c("Sinusoidal (Sine Curve)", "Alternating")
+density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2,3)+0.1, y = 0.18,
+                       label= paste("italic(k)==", c(fluctuation_table["Alternating", "K"],
+                                                     fluctuation_table["Sinusoidal (Sine Curve)", "K"], 
+                                                     fluctuation_table["Stepwise", "K"]), "~","(", 
+                                                   c(fluctuation_table["Alternating", "group_no"],
+                                                    fluctuation_table["Sinusoidal (Sine Curve)","group_no"], 
+                                                     fluctuation_table["Stepwise", "group_no"]), 
+                                    ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(paste(format(round(mean(exp(Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                  paste(format(round(mean(exp(Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                  paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
-fluctuation_k_1 <- data.frame("k" = c(Fluctuation_Exploration["Sinusoidal (Sine Curve)", "Freq"], 
-                                      Fluctuation_Exploration["Alternating", "Freq"]), 
-                              row.names = fluctuation_rnames_1)
-
-fluctuation_group_no_1 <- data.frame("Spp No." = c(Fluctuation_Species_Count["Sinusoidal (Sine Curve)", "Freq"], 
-                                                   Fluctuation_Species_Count["Alternating", "Freq"]), 
-                                     row.names = fluctuation_rnames_1)
-
-fluctuation_study_1 <- data.frame("Study" = c(Fluctuation_Study_Count["Sinusoidal (Sine Curve)", "Freq"], 
-                                              Fluctuation_Study_Count["Alternating", "Freq"]), 
-                                  row.names = fluctuation_rnames_1)
-
-
-Fluctuation_Model_Estimates_Reorder_1 <- Fluctuation_Model_Estimates[c("Sinusoidal (Sine Curve)", "Alternating"), ]
-
-fluctuation_table_1 <- data.frame(estimate = Fluctuation_Model_Estimates_Reorder_1[,"estimate"], 
-                                  lowerCL = Fluctuation_Model_Estimates_Reorder_1[,"ci.lb"], 
-                                  upperCL = Fluctuation_Model_Estimates_Reorder_1[,"ci.ub"], 
-                                  K = fluctuation_k_1[,1], 
-                                  group_no = fluctuation_group_no_1[,1], 
-                                  row.names = fluctuation_rnames_1)
-fluctuation_table_1$name <- row.names(fluctuation_table_1)
-
-fluctuation_raw_mean_1 <- c(unlist(unname(Fluctuation_Data %>% filter(`Fluctuation_Category` == "Sinusoidal (Sine Curve)") %>% 
-                                          select("InRR_Transformed"))), 
-                            unlist(unname(Fluctuation_Data %>% filter(`Fluctuation_Category` == "Alternating") %>% 
-                                          select("InRR_Transformed"))))
-
-fluctuation_raw_name_1 <- c(replicate(80, "Sinusoidal (Sine Curve)"), 
-                            replicate(54, "Alternating"))
-
-fluctuation_raw_df_1 <- data.frame("Model" = fluctuation_raw_name_1, 
-                                   "Effect" = fluctuation_raw_mean_1)
-
-# Graph code - Part 1
-
-Fluctuation_Order_1 <- c("Alternating", "Sinusoidal (Sine Curve)")
-
-density_fluctuation_1 <- fluctuation_table_1 %>% mutate(name = fct_relevel(name, Fluctuation_Order_1)) %>%
-                         ggplot() +
-                         geom_density_ridges(data = fluctuation_raw_df_1 %>% mutate(Model = fct_relevel(Model, Fluctuation_Order_1)), 
-                                             aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                 scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                         geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table_1)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                        size = 1) +
-                         geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table_1)[1], 1)), xmin = min(fluctuation_raw_df_1$Effect)-0.01, xmax = -1.5, colour = name),
-                                        size = 1) +
-                         geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table_1)[1], 1)), xmin = max(fluctuation_raw_df_1$Effect)+0.02, xmax = 1.5, colour = name),
-                                        size = 1) +
-                         geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(fluctuation_table_1)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                         size = 1, fatten = 2) +
-                         theme_bw() +
-                         guides(fill = "none", colour = "none") +
-                         labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                         theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                               vjust = c(-2.7, -0.8))) +
-                         theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                         theme(axis.ticks = element_blank()) +
-                         theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                         theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                         scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                         scale_colour_manual(values = c("#4A6E9C", "#2B4E7A")) +
-                         scale_fill_manual(values = c("#4A6E9C", "#2B4E7A")) +
-                         coord_cartesian(xlim = c(-0.5, 0.5)) +
-                         annotate('text',  x = 0.5, y = (seq(1, dim(fluctuation_table_1)[1], 1)+0.4),
-                         label= paste("italic(k)==", c(fluctuation_table_1["Alternating", "K"], 
-                                                       fluctuation_table_1["Sinusoidal (Sine Curve)", "K"]), "~","(", 
-                                                     c(fluctuation_table_1["Alternating", "group_no"], 
-                                                       fluctuation_table_1["Sinusoidal (Sine Curve)", "group_no"]), 
-                                      ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                         geom_label(aes(label=c(paste(format(round(mean(exp(Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                               paste(format(round(mean(exp(Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                   x = -0.4, y = (seq(1, dim(fluctuation_table_1)[1], 1)+0.4)), size = 3.5)
-density_fluctuation_1
-
-# Preparing Graph - Part 2
-
-fluctuation_rnames_2 <- c("Stepwise")
-
-fluctuation_k_2 <- data.frame("k" = c(Fluctuation_Exploration["Stepwise", "Freq"]), 
-                              row.names = fluctuation_rnames_2)
-
-fluctuation_group_no_2 <- data.frame("Spp No." = c(Fluctuation_Species_Count["Stepwise", "Freq"]), 
-                                     row.names = fluctuation_rnames_2)
-
-fluctuation_study_2 <- data.frame("Study" = c(Fluctuation_Study_Count["Stepwise", "Freq"]), 
-                                  row.names = fluctuation_rnames_2)
-
-
-Fluctuation_Model_Estimates_Reorder_2 <- Fluctuation_Model_Estimates[c("Stepwise"), ]
-
-fluctuation_table_2 <- data.frame(estimate = Fluctuation_Model_Estimates_Reorder_2[,"estimate"], 
-                                  lowerCL = Fluctuation_Model_Estimates_Reorder_2[,"ci.lb"], 
-                                  upperCL = Fluctuation_Model_Estimates_Reorder_2[,"ci.ub"], 
-                                  K = fluctuation_k_2[,1], 
-                                  group_no = fluctuation_group_no_2[,1], 
-                                  row.names = fluctuation_rnames_2)
-fluctuation_table_2$name <- row.names(fluctuation_table_2)
-
-fluctuation_raw_mean_2 <- c(unlist(unname(Fluctuation_Data %>% filter(`Fluctuation_Category` == "Stepwise") %>% 
-                                          select("InRR_Transformed"))))
-
-fluctuation_raw_name_2 <- c(replicate(48, "Stepwise"))
-
-fluctuation_raw_df_2 <- data.frame("Model" = fluctuation_raw_name_2, 
-                                   "Effect" = fluctuation_raw_mean_2)
-
-# Graph code - Part 2
-
-Fluctuation_Order_2 <- c("Stepwise")
-
-density_fluctuation_2 <- fluctuation_table_2 %>% mutate(name = fct_relevel(name, Fluctuation_Order_2)) %>%
-                         ggplot() +
-                         geom_density_ridges(data = fluctuation_raw_df_2 %>% mutate(Model = fct_relevel(Model, Fluctuation_Order_2)), 
-                                             aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                 scale = 0.04, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                         geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table_2)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                        size = 1) +
-                         geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table_2)[1], 1)), xmin = min(fluctuation_raw_df_2$Effect)-0.01, xmax = -1.5, colour = name),
-                                        size = 1) +
-                         geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table_2)[1], 1)), xmin = max(fluctuation_raw_df_2$Effect)+0.02, xmax = 1.5, colour = name),
-                                        size = 1) +
-                         geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(fluctuation_table_2)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                         size = 1, fatten = 2) +
-                         theme_bw() +
-                         guides(fill = "none", colour = "none") +
-                         labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                         theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                          vjust = c(-2.7))) +
-                         theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                         theme(axis.ticks = element_blank()) +
-                         theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                         theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                         scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                         scale_colour_manual(values = c("#5D7AA1")) +
-                         scale_fill_manual(values = c("#5D7AA1")) +
-                         coord_cartesian(xlim = c(-0.5, 0.5)) +
-                         annotate('text',  x = 0.5, y = (seq(1, dim(fluctuation_table_2)[1], 1)+0.4),
-                         label= paste("italic(k)==", c(fluctuation_table_2["Stepwise", "K"]), "~","(", 
-                                                     c(fluctuation_table_2["Stepwise", "group_no"]), 
-                                      ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                         geom_label(aes(label=c(paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                    x = -0.4, y = (seq(1, dim(fluctuation_table_2)[1], 1)+0.4)), size = 3.5)
-density_fluctuation_2
+  ggsave(filename = "./output/figs/fig7.png", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
+  
+##--------------------------------------------##
 
 ##### Overall Model - Trait Meta-Regression #####
 Trait_Exploration <- data %>% select("Trait_Category") %>% table() %>% data.frame()
