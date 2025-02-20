@@ -192,7 +192,7 @@ fluctuation_raw_df <- data.frame("Model" = fluctuation_raw_name,
 Fluctuation_Order <- c("Stepwise", "Alternating", "Sinusoidal (Sine Curve)")
 
 #### ORCHARD PLOT VERSIONS ####
-
+# Figure 7 in main paper
 my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
                               axis.text.x = element_text(margin = margin(b = 5), size = 16), 
                               axis.ticks = element_blank(),
@@ -217,9 +217,10 @@ density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID
                   paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
                  x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
-  ggsave(filename = "./output/figs/fig7.pdf", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
+  ggsave(filename = "./output/figs/fig7.png", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
 ##-------------------------------##
 
+### OLDER VERSIONS ###
 density_fluctuation <- fluctuation_table %>% mutate(name = fct_relevel(name, Fluctuation_Order)) %>%
                        ggplot() +
                        geom_density_ridges(data = fluctuation_raw_df %>% mutate(Model = fct_relevel(Model, Fluctuation_Order)), 
