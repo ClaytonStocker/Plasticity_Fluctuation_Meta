@@ -16,6 +16,7 @@ data <- read.csv("./Complex_Final_Data.csv")
 data$obs <- 1:nrow(data)
 data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
 data$phylo <- data$Scientific_Name
+data$vert_invert <- ifelse(data$Phylum == "Chordata" , "Vertebrate", "Invertebrate")
 
 # Phylogenetic covariance matrix
 tree <- ape::read.tree("./Complex_tree")
@@ -425,162 +426,53 @@ density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Tr
   ggsave(filename = "./output/figs/fig4.png", density_trait_orchard, width = 8.679012, height =  8.049383)
 
 #### -------------------------------------------- ####
-##### Overall Model - Class Meta-Regression #####
-Class_Exploration <- data %>% select("Class") %>% table() %>% data.frame()
-rownames(Class_Exploration) <- Class_Exploration$Class
+##### Overall Model - Invert/Vert Meta-Regression #####
+vert_invert_Exploration <- data %>% select("vert_invert") %>% table() %>% data.frame()
+rownames(vert_invert_Exploration) <- vert_invert_Exploration$vert_invert
 
-# Lets see breakdown by class and how many species exist within each class. n = 1 means only one species exists in that class which is why the rest are excluded. I don't really think this is super useful and is a litle misleading because the other models all amalgamate the species. If you have so many instances with one species per class then class is really not a useful predictor.
-
-Class_Exploration2 <- data  %>% group_by(Phylum) %>% summarise(num = n_distinct(Scientific_Name))
-
-Class_Data <- data %>% filter(Class != "Actinopteri" &
-                              Class != "Amphibia" &
-                              Class != "Anthozoa" &
-                              Class != "Branchiopoda" &
-                              Class != "Clitellata" &
-                              Class != "Gastropoda" &
-                              Class != "Holothuroidea")
-
-Class_Species_Count <- Class_Data %>% select("Scientific_Name", "Class") %>% table() %>% data.frame() %>% 
-                       filter(`Freq` != 0) %>% select("Class") %>% table() %>% data.frame()
-rownames(Class_Species_Count) <- Class_Species_Count$Class
-
-Class_Study_Count <- Class_Data %>% select("Study_ID", "Class") %>% table() %>% data.frame() %>% 
-                     filter(`Freq` != 0) %>% select("Class") %>% table() %>% data.frame()
-rownames(Class_Study_Count) <- Class_Study_Count$Class
-
-Class_Species <- Class_Data %>% select("phylo") %>% unique()
-
-Class_A_cor <- as.data.frame(A_cor)
-Class_A_cor <- Class_A_cor[c(Class_Species$phylo), c(Class_Species$phylo)]
-Class_A_cor <- as.matrix(Class_A_cor)
-
-Class_VCV <- make_VCV_matrix(Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+invert_vert_data <- data
 
 run <- TRUE
 system.time(
   if(run){
-    Class_Model <- metafor::rma.mv(InRR_Transformed, V = Class_VCV, test = "t", dfs = "contain",
-                                   mods = ~ Class - 1,
+    vert_invert_Model <- metafor::rma.mv(InRR_Transformed ~ vert_invert-1, V = VCV, test = "t", dfs = "contain",
                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
-                                   R = list(phylo=Class_A_cor), data = Class_Data, method = "REML", sparse = TRUE, 
+                                   R = list(phylo=A_cor), data = invert_vert_data, method = "REML", sparse = TRUE, 
                                    control=list(rel.tol=1e-9))
-    saveRDS(Class_Model, "./output/models/Complex_Class_Model.rds")
+    saveRDS(vert_invert_Model, "./output/models/Complex_vert_invert_Model.rds")
   } else {
-    Class_Model <- readRDS("./output/models/Complex_Class_Model.rds")})
+    vert_invert_Model <- readRDS("./output/models/Complex_vert_invert_Model.rds")})
 
-Class_Model_rob <- robust(Class_Model, cluster = Class_Data$Study_ID, adjust = TRUE)
+vert_invert_Model_rob <- robust(vert_invert_Model, cluster = invert_vert_data$Study_ID, adjust = TRUE)
 
-Class_Model_Estimates <- data.frame(Class = substr(row.names(Class_Model$b), 6, 100),
-                                    estimate = Class_Model$b, 
-                                    ci.lb = Class_Model$ci.lb, 
-                                    ci.ub = Class_Model$ci.ub)
-rownames(Class_Model_Estimates) <- Class_Model_Estimates$Class
-Class_Model_i2 <- data.frame(round(orchaRd::i2_ml(Class_Model), 2))
+vert_invert_Model_Estimates <- data.frame(vert_invert = substr(row.names(vert_invert_Model_rob$b), 6, 100),
+                                    estimate = vert_invert_Model_rob$b, 
+                                    ci.lb = vert_invert_Model_rob$ci.lb, 
+                                    ci.ub = vert_invert_Model_rob$ci.ub)
+rownames(vert_invert_Model_Estimates) <- NULL
+vert_invert_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(vert_invert_Model_rob_Model), 2))
 
-# Preparing Graph - Combined
 
-class_rnames <- c("Arachnida", "Insecta", "Malacostraca")
-
-class_k <- data.frame("k" = c(Class_Exploration["Arachnida", "Freq"], 
-                              Class_Exploration["Insecta", "Freq"],
-                              Class_Exploration["Malacostraca", "Freq"]), 
-                      row.names = class_rnames)
-
-class_group_no <- data.frame("Spp No." = c(Class_Species_Count["Arachnida", "Freq"],
-                                           Class_Species_Count["Insecta", "Freq"],
-                                           Class_Species_Count["Malacostraca", "Freq"]), 
-                             row.names = class_rnames)
-
-class_study <- data.frame("Study" = c(Class_Study_Count["Arachnida", "Freq"],
-                                      Class_Study_Count["Insecta", "Freq"],
-                                      Class_Study_Count["Malacostraca", "Freq"]), 
-                          row.names = class_rnames)
-
-class_table <- data.frame(estimate = Class_Model_Estimates[,"estimate"], 
-                          lowerCL = Class_Model_Estimates[,"ci.lb"], 
-                          upperCL = Class_Model_Estimates[,"ci.ub"], 
-                          K = class_k[,1], 
-                          group_no = class_group_no[,1], 
-                          row.names = class_rnames)
-class_table$name <- row.names(class_table)
-
-class_raw_mean <- c(unlist(unname(Class_Data %>% filter(`Class` == "Arachnida") %>% 
-                                    select("InRR_Transformed"))), 
-                    unlist(unname(Class_Data %>% filter(`Class` == "Insecta") %>% 
-                                    select("InRR_Transformed"))),
-                    unlist(unname(Class_Data %>% filter(`Class` == "Malacostraca") %>% 
-                                    select("InRR_Transformed"))))
-
-class_raw_name <- c(replicate(11, "Arachnida"), 
-                    replicate(108, "Insecta"),
-                    replicate(11, "Malacostraca"))
-
-class_raw_df <- data.frame("Model" = class_raw_name, 
-                           "Effect" = class_raw_mean)
-
-# Graph code - Combined
-
-Class_Order <- c("Malacostraca", "Insecta", "Arachnida")
-
-density_class <- class_table %>% mutate(name = fct_relevel(name, Class_Order)) %>%
-                 ggplot() +
-                 geom_density_ridges(data = class_raw_df %>% mutate(Model = fct_relevel(Model, Class_Order)), 
-                                     aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                         scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                 geom_linerange(aes(y = rev(seq(1, dim(class_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                    size = 1) +
-                 geom_linerange(aes(y = rev(seq(1, dim(class_table)[1], 1)), xmin = min(class_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
-                                size = 1) +
-                 geom_linerange(aes(y = rev(seq(1, dim(class_table)[1], 1)), xmin = max(class_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                size = 1) +
-                 geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(class_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                     size = 1, fatten = 2) +
-                 theme_bw() +
-                 guides(fill = "none", colour = "none") +
-                 labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                 theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                  vjust = c(-2.7, -2.7, -2.7))) +
-                 theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                 theme(axis.ticks = element_blank()) +
-                 theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                 theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                 scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                 scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#2B4E7A")) +
-                 scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#2B4E7A")) +
-                 coord_cartesian(xlim = c(-0.5, 0.5)) +
-                 annotate('text',  x = 0.5, y = (seq(1, dim(class_table)[1], 1)+0.4),
-                 label= paste("italic(k)==", c(class_table["Malacostraca", "K"], 
-                                               class_table["Insecta", "K"], 
-                                               class_table["Arachnida", "K"]), "~","(", 
-                                             c(class_table["Malacostraca", "group_no"], 
-                                               class_table["Insecta", "group_no"], 
-                                               class_table["Arachnida", "group_no"]), 
-                              ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                 geom_label(aes(label=c(paste(format(round(mean(exp(Class_Model_Estimates["Malacostraca", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                        paste(format(round(mean(exp(Class_Model_Estimates["Insecta", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                        paste(format(round(mean(exp(Class_Model_Estimates["Arachnida", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                x = -0.4, y = (seq(1, dim(class_table)[1], 1)+0.4)), size = 3.5)
-
-density_class
-
+# Orchard plot preparation
+  invert_vert_table <- data  %>% group_by(vert_invert) %>% summarise(k = n(), group_no = n_distinct(Study_ID)) %>% cbind(vert_invert_Model_Estimates[,-1])
+                                
 ### OCHARD PLOT VERSION ###
 
-density_class_orchard <- orchard_plot(Class_Model, group = "Study_ID", mod = "Class", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
                   my_theme() + 
-                  annotate('text',  x = c(1,2,3)+0.1, y = 0.18, label= paste("italic(k)==", c(class_table["Arachnida", "K"], 
-                                               class_table["Insecta", "K"], 
-                                               class_table["Malacostraca", "K"]), "~","(", 
-                                             c(class_table["Arachnida", "group_no"], 
-                                               class_table["Insecta", "group_no"], 
-                                               class_table["Malacostraca", "group_no"]), ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label=c(paste(format(round(mean(exp(Class_Model_Estimates["Arachnida", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                        paste(format(round(mean(exp(Class_Model_Estimates["Insecta", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                        paste(format(round(mean(exp(Class_Model_Estimates["Malacostraca", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                 x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+                  annotate('text',  x = c(1,2)+0.1, y = 0.18, 
+                            label= paste("italic(k)==", 
+                                        c(invert_vert_table[1, "k"], 
+                                          invert_vert_table[2, "k"]), "~","(", 
+                                        c(invert_vert_table[1, "group_no"], 
+                                          invert_vert_table[2, "group_no"]),
+                             ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(paste(format(round(mean(exp(vert_invert_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                           paste(format(round(mean(exp(vert_invert_Model_Estimates[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
-  ggsave(filename = "./output/figs/fig6.png", density_class_orchard, width = 8.679012, height =  8.049383)
+  ggsave(filename = "./output/figs/fig6.png", density_vert_invert_orchard, width = 8.679012, height =  8.049383)
 
 ####--------------------------------------------####
 
@@ -3740,8 +3632,9 @@ density_intercept <- intercept_table %>% mutate(name = fct_relevel(name, Interce
                                x = -0.4, y = (seq(1, dim(intercept_table)[1], 1)+0.4)), size = 3.5)
 density_intercept
 
-
+####################################################################
 ##### Supplementary Material Tables #####
+####################################################################
 
 # Consistency Changes - Studies, Species and Effect Sizes Counts
 
