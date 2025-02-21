@@ -3,8 +3,8 @@
 rm(list = ls())
 if (!require("pacman")) install.packages("pacman")
 if (!require("devtools")) install.packages("devtools")
-if (!require("metaAidR")) devtools::install_gitgub("daniel1noble/metaAidR", force = TRUE)
-if (!require("orchaRd")) devtools::install_gitgub("daniel1noble/orchaRd", force = TRUE)
+if (!require("metaAidR")) devtools::install_github("daniel1noble/metaAidR", force = TRUE)
+if (!require("orchaRd")) remotes::install_github("daniel1noble/orchaRd", dependencies = TRUE, force = TRUE)
 pacman::p_load(tidyverse, readxl, gtsummary, dplyr, 
                tidyr, ggplot2, rotl, DescTools, stringr, ape, 
                emmeans, patchwork, latex2exp, metafor, brms, 
@@ -43,7 +43,8 @@ system.time(
                                      control=list(rel.tol=1e-9))
     saveRDS(Overall_Model, "./output/models/Complex_Overall_Model.rds")
   } else {
-    Overall_Model <- readRDS("./output/models/Complex_Overall_Model.rds")})
+    Overall_Model <- readRDS("./output/models/Complex_Overall_Model.rds")
+  })
 
 Overall_Model_rob <- robust(Overall_Model, cluster = data$Study_ID, adjust = TRUE)
 
@@ -63,7 +64,8 @@ system.time(
                                        control=list(rel.tol=1e-9))
     saveRDS(Amplitude_Model, "./output/models/Complex_Amplitude_Model.rds")
   } else {
-    Amplitude_Model <- readRDS("./output/models/Complex_Amplitude_Model.rds")})
+    Amplitude_Model <- readRDS("./output/models/Complex_Amplitude_Model.rds")
+    })
 
 Amplitude_Model_rob <- robust(Amplitude_Model, cluster = data$Study_ID, adjust = TRUE)
 
@@ -134,7 +136,8 @@ system.time(
                                          control=list(rel.tol=1e-9))
     saveRDS(Fluctuation_Model, "./output/models/Complex_Fluctuation_Model.rds")
   } else {
-    Fluctuation_Model <- readRDS("./output/models/Complex_Fluctuation_Model.rds")})
+    Fluctuation_Model <- readRDS("./output/models/Complex_Fluctuation_Model.rds")
+    })
 
 Fluctuation_Model_rob <- robust(Fluctuation_Model, cluster = Fluctuation_Data$Study_ID, adjust = TRUE)
 
@@ -297,7 +300,8 @@ system.time(
                                    control=list(rel.tol=1e-9))
     saveRDS(Trait_Model, "./output/models/Complex_Trait_Model.rds")
   } else {
-    Trait_Model <- readRDS("./output/models/Complex_Trait_Model.rds")})
+    Trait_Model <- readRDS("./output/models/Complex_Trait_Model.rds")
+    })
 
 Trait_Model_rob <- robust(Trait_Model, cluster = Trait_Data$Study_ID, adjust = TRUE)
 
@@ -360,173 +364,57 @@ trait_raw_name <- c(replicate(32, "Biochemical Assay"),
 trait_raw_df <- data.frame("Model" = trait_raw_name, 
                            "Effect" = trait_raw_mean)
 
-# Graph code - Combined
+# Graph code - Combined OLDER VERSION
 
-Trait_Order <- c("Physiological", "Morphological", "Life-history Traits", "Biochemical Assay")
+  Trait_Order <- c("Physiological", "Morphological", "Life-history Traits", "Biochemical Assay")
 
-density_trait <- trait_table %>% mutate(name = fct_relevel(name, Trait_Order)) %>%
-                 ggplot() +
-                 geom_density_ridges(data = trait_raw_df %>% mutate(Model = fct_relevel(Model, Trait_Order)), 
-                                     aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                         scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                 geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                    size = 1) +
-                 geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)), xmin = min(trait_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
-                                size = 1) +
-                 geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)), xmin = max(trait_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                size = 1) +
-                 geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                     size = 1, fatten = 2) +
-                 theme_bw() +
-                 guides(fill = "none", colour = "none") +
-                 labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                 theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                   vjust = c(-2.7, -2.7, -0.8, -0.8))) +
-                 theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                 theme(axis.ticks = element_blank()) +
-                 theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                 theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                 scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                 scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
-                 scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
-                 coord_cartesian(xlim = c(-0.5, 0.5)) +
-                 annotate('text',  x = 0.5, y = (seq(1, dim(trait_table)[1], 1)+0.4),
-                 label= paste("italic(k)==", c(trait_table["Physiological", "K"], 
-                                               trait_table["Morphological", "K"], 
-                                               trait_table["Life-history Traits", "K"],
-                                               trait_table["Biochemical Assay", "K"]), "~","(", 
-                                             c(trait_table["Physiological", "group_no"], 
-                                               trait_table["Morphological", "group_no"], 
-                                               trait_table["Life-history Traits", "group_no"],
-                                               trait_table["Biochemical Assay", "group_no"]), 
-                              ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                 geom_label(aes(label=c(paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                        paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                        paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                        paste(format(round(mean(exp(Trait_Model_Estimates["Biochemical Assay", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                x = -0.4, y = (seq(1, dim(trait_table)[1], 1)+0.4)), size = 3.5)
+  density_trait <- trait_table %>% mutate(name = fct_relevel(name, Trait_Order)) %>%
+                  ggplot() +
+                  geom_density_ridges(data = trait_raw_df %>% mutate(Model = fct_relevel(Model, Trait_Order)), 
+                                      aes(x = Effect, y = Model, colour = Model, fill = Model), 
+                                          scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
+                  geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
+                                      size = 1) +
+                  geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)), xmin = min(trait_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
+                                  size = 1) +
+                  geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)), xmin = max(trait_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
+                                  size = 1) +
+                  geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
+                                      size = 1, fatten = 2) +
+                  theme_bw() +
+                  guides(fill = "none", colour = "none") +
+                  labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
+                  theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
+                                    vjust = c(-2.7, -2.7, -0.8, -0.8))) +
+                  theme(axis.text.x = element_text(margin = margin(b = 5))) +
+                  theme(axis.ticks = element_blank()) +
+                  theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
+                  theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
+                  scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
+                  scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
+                  scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
+                  coord_cartesian(xlim = c(-0.5, 0.5)) +
+                  annotate('text',  x = 0.5, y = (seq(1, dim(trait_table)[1], 1)+0.4),
+                  label= paste("italic(k)==", c(trait_table["Physiological", "K"], 
+                                                trait_table["Morphological", "K"], 
+                                                trait_table["Life-history Traits", "K"],
+                                                trait_table["Biochemical Assay", "K"]), "~","(", 
+                                              c(trait_table["Physiological", "group_no"], 
+                                                trait_table["Morphological", "group_no"], 
+                                                trait_table["Life-history Traits", "group_no"],
+                                                trait_table["Biochemical Assay", "group_no"]), 
+                                ")"), parse = TRUE, hjust = "right", size = 3.5) +
+                  geom_label(aes(label=c(paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                                          paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                          paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                          paste(format(round(mean(exp(Trait_Model_Estimates["Biochemical Assay", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                                  x = -0.4, y = (seq(1, dim(trait_table)[1], 1)+0.4)), size = 3.5)
 
-density_trait
+  density_trait
 
 ## ORCHARD PLOT VERSION ##
-density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
-                  my_theme() + 
-                  annotate('text',  x = c(1,2,3,4)+0.1, y = 0.18, label = 
-                       paste("italic(k)==", c(trait_table["Biochemical Assay", "K"], 
-                                              trait_table["Life-history Traits", "K"],
-                                              trait_table["Morphological", "K"],
-                                              trait_table["Physiological", "K"]), "~","(", 
-                                             c(trait_table["Biochemical Assay", "group_no"],
-                                             trait_table["Life-history Traits", "group_no"],
-                                             trait_table["Morphological", "group_no"],
-                                                trait_table["Physiological", "group_no"]), ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label=c(
-                    paste(format(round(mean(exp(Trait_Model_Estimates["Biochemical Assay", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                     paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                     paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                    paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                 x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
-
-  ggsave(filename = "./output/figs/fig4.png", density_trait_orchard, width = 8.679012, height =  8.049383)
-
+# See below. Merged with traits plot
 #### -------------------------------------------- ####
-##### Overall Model - Invert/Vert Meta-Regression #####
-vert_invert_Exploration <- data %>% select("vert_invert") %>% table() %>% data.frame()
-rownames(vert_invert_Exploration) <- vert_invert_Exploration$vert_invert
-
-invert_vert_data <- data
-
-run <- TRUE
-system.time(
-  if(run){
-    vert_invert_Model <- metafor::rma.mv(InRR_Transformed ~ vert_invert-1, V = VCV, test = "t", dfs = "contain",
-                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
-                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
-                                   R = list(phylo=A_cor), data = invert_vert_data, method = "REML", sparse = TRUE, 
-                                   control=list(rel.tol=1e-9))
-    saveRDS(vert_invert_Model, "./output/models/Complex_vert_invert_Model.rds")
-  } else {
-    vert_invert_Model <- readRDS("./output/models/Complex_vert_invert_Model.rds")})
-
-vert_invert_Model_rob <- robust(vert_invert_Model, cluster = invert_vert_data$Study_ID, adjust = TRUE)
-
-vert_invert_Model_Estimates <- data.frame(vert_invert = substr(row.names(vert_invert_Model_rob$b), 6, 100),
-                                    estimate = vert_invert_Model_rob$b, 
-                                    ci.lb = vert_invert_Model_rob$ci.lb, 
-                                    ci.ub = vert_invert_Model_rob$ci.ub,
-                                    df = vert_invert_Model$ddf,
-                                    pval = vert_invert_Model$pval)
-rownames(vert_invert_Model_Estimates) <- NULL
-vert_invert_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(vert_invert_Model_rob), 2))
-
-
-# Orchard plot preparation
-  invert_vert_table <- data  %>% group_by(vert_invert) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(vert_invert_Model_Estimates[,-1])
-                                
-### OCHARD PLOT VERSION ###
-
-density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
-                  my_theme() + 
-                  annotate('text',  x = c(1,2)+0.1, y = 0.18, 
-                            label= paste("italic(k)==", 
-                                        c(invert_vert_table[1, "k"], 
-                                          invert_vert_table[2, "k"]), "~","(", 
-                                        c(invert_vert_table[1, "group_no"], 
-                                          invert_vert_table[2, "group_no"]),
-                             ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label=c(paste(format(round(mean(exp(vert_invert_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                           paste(format(round(mean(exp(vert_invert_Model_Estimates[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                 x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
-
-  ggsave(filename = "./output/figs/fig6.png", density_vert_invert_orchard, width = 8.679012, height =  8.049383)
-
-####--------------------------------------------####
-
-##### Overall Model - Habitat Meta-Regression #####
-
-run <- TRUE
-system.time(
-  if(run){
-    habitat_Model <- metafor::rma.mv(InRR_Transformed ~ Ecosystem-1, V = VCV, test = "t", dfs = "contain",
-                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
-                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
-                                   R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
-                                   control=list(rel.tol=1e-9))
-    saveRDS(habitat_Model, "./output/models/Complex_habitat_Model.rds")
-  } else {
-    habitat_Model <- readRDS("./output/models/Complex_habitat_Model.rds")})
-
-habitat_Model_rob <- robust(habitat_Model, cluster = data$Study_ID, adjust = TRUE)
-
-habitat_Model_Estimates <- data.frame(habitat = substr(row.names(habitat_Model_rob$b), 6, 100),
-                                    estimate = habitat_Model_rob$b, 
-                                    ci.lb = habitat_Model_rob$ci.lb, 
-                                    ci.ub = habitat_Model_rob$ci.ub,
-                                    df = habitat_Model$ddf,
-                                    pval = habitat_Model$pval)
-rownames(habitat_Model_Estimates) <- NULL
-habitat_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(habitat_Model_rob), 2))
-
-
-# Orchard plot preparation
-  habitat_table <- data  %>% group_by(Ecosystem) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(habitat_Model_Estimates[,-1])
-                                
-### OCHARD PLOT VERSION ###
-
-density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
-                  my_theme() + 
-                  annotate('text',  x = c(1,2)+0.1, y = 0.18, 
-                            label= paste("italic(k)==", 
-                                        c(habitat_table[1, "k"], 
-                                          habitat_table[2, "k"]), "~","(", 
-                                        c(habitat_table[1, "group_no"], 
-                                          habitat_table[2, "group_no"]),
-                             ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label=c(paste(format(round(mean(exp(habitat_table[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                           paste(format(round(mean(exp(habitat_table[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                 x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
-
-  ggsave(filename = "./output/figs/fighabitat.png", density_habitat_orchard, width = 8.679012, height =  8.049383)
 
 
 ##### Overall Model - Specific Trait Meta-Regression #####
@@ -566,7 +454,8 @@ system.time(
                                             control=list(rel.tol=1e-9))
     saveRDS(Specific_Trait_Model, "./output/models/Complex_Specific_Trait_Model.rds")
   } else {
-    Specific_Trait_Model <- readRDS("./output/models/Complex_Specific_Trait_Model.rds")})
+    Specific_Trait_Model <- readRDS("./output/models/Complex_Specific_Trait_Model.rds")
+    })
 
 Specific_Trait_Model_rob <- robust(Specific_Trait_Model, cluster = Specific_Trait_Data$Study_ID, adjust = TRUE)
 
@@ -674,7 +563,26 @@ density_specific_trait <- specific_trait_table %>% mutate(name = fct_relevel(nam
 
 density_specific_trait
 
-### ORCHARD PLOT VERSION ###
+### ORCHARD PLOT VERSION MERGING 4 and 5 ###
+
+density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2,3,4)+0.1, y = 0.18, label = 
+                       paste("italic(k)==", c(trait_table["Biochemical Assay", "K"], 
+                                              trait_table["Life-history Traits", "K"],
+                                              trait_table["Morphological", "K"],
+                                              trait_table["Physiological", "K"]), "~","(", 
+                                             c(trait_table["Biochemical Assay", "group_no"],
+                                             trait_table["Life-history Traits", "group_no"],
+                                             trait_table["Morphological", "group_no"],
+                                                trait_table["Physiological", "group_no"]), ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(
+                    paste(format(round(mean(exp(Trait_Model_Estimates["Biochemical Assay", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                     paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                     paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                    paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+
 
 density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.25, 0.25) + 
                   my_theme() + 
@@ -692,9 +600,110 @@ density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "St
                     paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Metabolic Rate", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
                  x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
+  fig4_5 <- (density_trait_orchard | density_specific_trait_orchard) + plot_annotation(tag_levels = "a", tag_suffix = ")", theme = theme(plot.tag.position = "top", plot.tag = element_text(size = 40, face = "italic")))
+
   ggsave(filename = "./output/figs/fig5.png", density_specific_trait_orchard, width = 8.679012, height =  8.049383)
 
 #### -------------------------------------------- ####
+
+##### Overall Model - Invert/Vert Meta-Regression #####
+vert_invert_Exploration <- data %>% select("vert_invert") %>% table() %>% data.frame()
+rownames(vert_invert_Exploration) <- vert_invert_Exploration$vert_invert
+
+invert_vert_data <- data
+
+run <- TRUE
+system.time(
+  if(run){
+    vert_invert_Model <- metafor::rma.mv(InRR_Transformed ~ vert_invert-1, V = VCV, test = "t", dfs = "contain",
+                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
+                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
+                                   R = list(phylo=A_cor), data = invert_vert_data, method = "REML", sparse = TRUE, 
+                                   control=list(rel.tol=1e-9))
+    saveRDS(vert_invert_Model, "./output/models/Complex_vert_invert_Model.rds")
+  } else {
+    vert_invert_Model <- readRDS("./output/models/Complex_vert_invert_Model.rds")})
+
+vert_invert_Model_rob <- robust(vert_invert_Model, cluster = invert_vert_data$Study_ID, adjust = TRUE)
+
+vert_invert_Model_Estimates <- data.frame(vert_invert = substr(row.names(vert_invert_Model_rob$b), 6, 100),
+                                    estimate = vert_invert_Model_rob$b, 
+                                    ci.lb = vert_invert_Model_rob$ci.lb, 
+                                    ci.ub = vert_invert_Model_rob$ci.ub,
+                                    df = vert_invert_Model$ddf,
+                                    pval = vert_invert_Model$pval)
+rownames(vert_invert_Model_Estimates) <- NULL
+vert_invert_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(vert_invert_Model_rob), 2))
+
+
+# Orchard plot preparation
+  invert_vert_table <- data  %>% group_by(vert_invert) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(vert_invert_Model_Estimates[,-1])
+                                
+### OCHARD PLOT VERSION ###
+
+density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2)+0.1, y = 0.18, 
+                            label= paste("italic(k)==", 
+                                        c(invert_vert_table[1, "k"], 
+                                          invert_vert_table[2, "k"]), "~","(", 
+                                        c(invert_vert_table[1, "group_no"], 
+                                          invert_vert_table[2, "group_no"]),
+                             ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(paste(format(round(mean(exp(vert_invert_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                           paste(format(round(mean(exp(vert_invert_Model_Estimates[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+
+  ggsave(filename = "./output/figs/fig6.png", density_vert_invert_orchard, width = 8.679012, height =  8.049383)
+
+####--------------------------------------------####
+
+##### Overall Model - Habitat Meta-Regression #####
+
+run <- TRUE
+system.time(
+  if(run){
+    habitat_Model <- metafor::rma.mv(InRR_Transformed ~ Ecosystem-1, V = VCV, test = "t", dfs = "contain",
+                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
+                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
+                                   R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
+                                   control=list(rel.tol=1e-9))
+    saveRDS(habitat_Model, "./output/models/Complex_habitat_Model.rds")
+  } else {
+    habitat_Model <- readRDS("./output/models/Complex_habitat_Model.rds")})
+
+habitat_Model_rob <- robust(habitat_Model, cluster = data$Study_ID, adjust = TRUE)
+
+habitat_Model_Estimates <- data.frame(habitat = substr(row.names(habitat_Model_rob$b), 6, 100),
+                                    estimate = habitat_Model_rob$b, 
+                                    ci.lb = habitat_Model_rob$ci.lb, 
+                                    ci.ub = habitat_Model_rob$ci.ub,
+                                    df = habitat_Model$ddf,
+                                    pval = habitat_Model$pval)
+rownames(habitat_Model_Estimates) <- NULL
+habitat_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(habitat_Model_rob), 2))
+
+
+# Orchard plot preparation
+  habitat_table <- data  %>% group_by(Ecosystem) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(habitat_Model_Estimates[,-1])
+                                
+### OCHARD PLOT VERSION ###
+
+density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2)+0.1, y = 0.18, 
+                            label= paste("italic(k)==", 
+                                        c(habitat_table[1, "k"], 
+                                          habitat_table[2, "k"]), "~","(", 
+                                        c(habitat_table[1, "group_no"], 
+                                          habitat_table[2, "group_no"]),
+                             ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label=c(paste(format(round(mean(exp(habitat_table[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                           paste(format(round(mean(exp(habitat_table[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
+                 x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+
+  ggsave(filename = "./output/figs/fighabitat.png", density_habitat_orchard, width = 8.679012, height =  8.049383)
+
 
 ##### Individual-Level Trait Subset Model #####
 Individual_Subset_Data <- data %>% filter(Trait_Category != "Population")
