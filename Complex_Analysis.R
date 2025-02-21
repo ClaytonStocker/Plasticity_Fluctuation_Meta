@@ -602,7 +602,7 @@ density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "St
 
   fig4_5 <- (density_trait_orchard | density_specific_trait_orchard) + plot_annotation(tag_levels = "a", tag_suffix = ")", theme = theme(plot.tag.position = "top", plot.tag = element_text(size = 40, face = "italic")))
 
-  ggsave(filename = "./output/figs/fig5.png", density_specific_trait_orchard, width = 8.679012, height =  8.049383)
+  ggsave(filename = "./output/figs/fig4_5.png", fig4_5, width = 13.7125, height =  7.4125)
 
 #### -------------------------------------------- ####
 
