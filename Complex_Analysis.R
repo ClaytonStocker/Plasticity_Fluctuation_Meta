@@ -1,35 +1,35 @@
 
 # Clean working space and load packages
-rm(list = ls())
-if (!require("pacman")) install.packages("pacman")
-if (!require("devtools")) install.packages("devtools")
-if (!require("metaAidR")) devtools::install_github("daniel1noble/metaAidR", force = TRUE)
-if (!require("orchaRd")) remotes::install_github("daniel1noble/orchaRd", dependencies = TRUE, force = TRUE)
-pacman::p_load(tidyverse, readxl, gtsummary, dplyr, 
-               tidyr, ggplot2, rotl, DescTools, stringr, ape, 
-               emmeans, patchwork, latex2exp, metafor, brms, 
-               flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
-               robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
+  rm(list = ls())
+  if (!require("pacman")) install.packages("pacman")
+  if (!require("devtools")) install.packages("devtools")
+  if (!require("metaAidR")) devtools::install_github("daniel1noble/metaAidR", force = TRUE)
+  if (!require("orchaRd")) remotes::install_github("daniel1noble/orchaRd", dependencies = TRUE, force = TRUE)
+  pacman::p_load(tidyverse, readxl, gtsummary, dplyr, 
+                tidyr, ggplot2, rotl, DescTools, stringr, ape, 
+                emmeans, patchwork, latex2exp, metafor, brms, 
+                flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
+                robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
 
 # Importing Data Set
-data <- read.csv("./Complex_Final_Data.csv")
-data$obs <- 1:nrow(data)
-data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
-data$phylo <- data$Scientific_Name
-data$vert_invert <- ifelse(data$Phylum == "Chordata" , "Vertebrate", "Invertebrate")
+                  data <- read.csv("./Complex_Final_Data.csv")
+              data$obs <- 1:nrow(data)
+  data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
+            data$phylo <- data$Scientific_Name
+      data$vert_invert <- ifelse(data$Phylum == "Chordata" , "Vertebrate", "Invertebrate")
 
 # Phylogenetic covariance matrix
-tree <- ape::read.tree("./Complex_tree")
-phy <- ape::compute.brlen(tree, method = "Grafen", power = 1)
-A <- ape::vcv.phylo(phy)
-row.names(A) <- colnames(A) <- row.names(A)
-A_cor <- ape::vcv.phylo(phy, corr = TRUE)
+          tree <- ape::read.tree("./Complex_tree")
+           phy <- ape::compute.brlen(tree, method = "Grafen", power = 1)
+             A <- ape::vcv.phylo(phy)
+  row.names(A) <- colnames(A) <- row.names(A)
+         A_cor <- ape::vcv.phylo(phy, corr = TRUE)
 
 # Variance Matrix (Shared Control)
-VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
+           VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
 
 # Periods used in different studies 
- sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
+    sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
                                                                   per = n/44*100) 
 
 ##### Overall Model #####
@@ -48,8 +48,9 @@ system.time(
 
 Overall_Model_rob <- robust(Overall_Model, cluster = data$Study_ID, adjust = TRUE)
 
-Overall_Model_Estimates <- data.frame(estimate = Overall_Model$b, ci.lb = Overall_Model$ci.lb, 
-                                      ci.ub = Overall_Model$ci.ub)
+Overall_Model_Estimates <- data.frame(estimate = Overall_Model$b, 
+                                         ci.lb = Overall_Model$ci.lb, 
+                                         ci.ub = Overall_Model$ci.ub)
 Overall_Model_i2 <- data.frame(round(orchaRd::i2_ml(Overall_Model), 2))
 
 
@@ -248,7 +249,7 @@ my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(
                               plot.tag = element_text(size = 16, face = "italic"))
                         }
 
-density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2,3)+0.1, y = 0.18,
                        label= paste("italic(k)==", c(fluctuation_table["Alternating", "K"],
@@ -414,9 +415,61 @@ trait_raw_df <- data.frame("Model" = trait_raw_name,
 
   density_trait
 
-## ORCHARD PLOT VERSION ##
-# See below. Merged with traits plot
-#### -------------------------------------------- ####
+## Overall model - Plasticity_Mechanism Meta-Regression ##
+plasticity_mec_data  <- data %>%  filter(Trait_Category != "Population")
+
+Individual_Species <- Individual_Subset_Data %>% select("phylo") %>% unique()
+
+Individual_A_cor <- as.data.frame(A_cor)
+Individual_A_cor <- Individual_A_cor[c(Individual_Species$phylo), c(Individual_Species$phylo)]
+Individual_A_cor <- as.matrix(Individual_A_cor)
+
+Individual_VCV <- make_VCV_matrix(Individual_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+
+run <- TRUE
+system.time(
+  if(run){
+    PlasticityMechanism_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_VCV, test = "t", dfs = "contain",
+                                            mods = ~ Plasticity_Mechanism - 1,
+                                            random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
+                                                          ~1|Shared_Animal_Number), 
+                                            R = list(phylo=Individual_A_cor), data = plasticity_mec_data, method = "REML", sparse = TRUE, 
+                                            control=list(rel.tol=1e-9))
+    saveRDS(PlasticityMechanism_Model, "./output/models/Complex_PlasticityMechanism_Model.rds")
+  } else {
+    PlasticityMechanism_Model <- readRDS("./output/models/Complex_PlasticityMechanism_Model.rds")
+    })
+
+
+PlasticityMechanism_Model_rob <- robust(PlasticityMechanism_Model, cluster = data$Study_ID, adjust = TRUE)
+
+PlasticityMechanism_Model_Estimates <- data.frame(estimate = PlasticityMechanism_Model$b, 
+                                                     ci.lb = PlasticityMechanism_Model$ci.lb, 
+                                                     ci.ub = PlasticityMechanism_Model$ci.ub,
+                                                     df = PlasticityMechanism_Model$ddf,
+                                                     pval = PlasticityMechanism_Model$pval)
+
+plasticity_mechanism_dat <- plasticity_mec_data %>% group_by(Plasticity_Mechanism) %>% summarise(group_no = length(unique(Study_ID)), spp = length(unique(phylo)), k = n())  %>% cbind(PlasticityMechanism_Model_Estimates) 
+rownames(plasticity_mechanism_dat) <- plasticity_mechanism_dat$Plasticity_Mechanism
+
+### OrchaRd Plot Version ###
+
+density_plasticiyMechanism_orchard <- orchard_plot(PlasticityMechanism_Model, group = "Study_ID", mod = "Plasticity_Mechanism", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
+                  my_theme() + 
+                  annotate('text',  x = c(1,2)+0.1, y = 0.18,
+                            label= paste("italic(k)==", c(plasticity_mechanism_dat["Acclimation", "k"],
+                                                          plasticity_mechanism_dat["Developmental Plasticity", "k"]), "~","(", 
+                                                        c(plasticity_mechanism_dat["Acclimation", "group_no"],
+                                                          plasticity_mechanism_dat["Developmental Plasticity", "group_no"]), ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', 
+                            label=c(paste(format(round(mean(exp(plasticity_mechanism_dat["Acclimation", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
+                                    paste(format(round(mean(exp(plasticity_mechanism_dat["Developmental Plasticity", "estimate"])-1)*100, 2), nsmall = 2), "%")), x = c(1,2)+0.1, y = -0.15, size = 6) + 
+                  geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Developmental Plasticity" = "Development"))
+
+  ggsave(filename = "./output/figs/fig8.png", density_plasticiyMechanism_orchard, width = 8.825, height =  7.200)
+
+  ##--------------------------------------------##
+
 
 
 ##### Overall Model - Specific Trait Meta-Regression #####
@@ -567,7 +620,7 @@ density_specific_trait
 
 ### ORCHARD PLOT VERSION MERGING 4 and 5 ###
 
-density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2,3,4)+0.1, y = 0.18, label = 
                        paste("italic(k)==", c(trait_table["Biochemical Assay", "K"], 
@@ -586,7 +639,7 @@ density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Tr
                  x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
 
-density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.25, 0.25) + 
+density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.25, 0.25) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2,3,4)+0.1, y = 0.22, label= paste("italic(k)==", c(specific_trait_table["Development Time", "K"],
                                               specific_trait_table["Length", "K"],
@@ -672,7 +725,7 @@ habitat_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(habitat_Model_rob)
                                 
 ### OCHARD PLOT VERSION ###
 
-density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2)+0.1, y = 0.18, 
                             label= paste("italic(k)==", 
@@ -686,7 +739,7 @@ density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod =
                  x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
 
-density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + 
+density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
                   annotate('text',  x = c(1,2)+0.1, y = 0.18, 
                             label= paste("italic(k)==", 
@@ -702,7 +755,7 @@ density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID
  size = 24
   position = "topleft"
   fig6 <- (density_habitat_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_vert_invert_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
-5.3750
+
   ggsave(filename = "./output/figs/fig6.png", fig6, width = 11.9125, height =  8.049383)
 
 ####--------------------------------------------####
@@ -736,14 +789,14 @@ Individual_Model_Estimates <- data.frame(estimate = Individual_Model$b, ci.lb = 
 Individual_Model_i2 <- data.frame(round(orchaRd::i2_ml(Individual_Model), 2))
 
 ### ORCHARD PLOT VERSION ###
-density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + my_theme() + 
+density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
                       annotate('text',  x =1+0.1, y = 0.18,
                        label= paste("italic(k)==", dim(data)[1], "~","(", length(unique(data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
                   annotate('text', label= paste(format(round(mean(exp(Overall_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
                  x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "Overall")) 
 
 
-indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE) + ylim(-0.2, 0.2) + my_theme() + 
+indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
                       annotate('text',  x =1+0.1, y = 0.18,
                        label= paste("italic(k)==", dim(Individual_Subset_Data)[1], "~","(", length(unique(Individual_Subset_Data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
                   annotate('text', label= paste(format(round(mean(exp(Individual_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
