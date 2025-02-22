@@ -1,36 +1,37 @@
+#####--Setup----------------------------#####
+  # Clean working space and load packages
+    rm(list = ls())
+    if (!require("pacman")) install.packages("pacman")
+    if (!require("devtools")) install.packages("devtools")
+    if (!require("metaAidR")) devtools::install_github("daniel1noble/metaAidR", force = TRUE)
+    if (!require("orchaRd")) remotes::install_github("daniel1noble/orchaRd", dependencies = TRUE, force = TRUE)
+    pacman::p_load(tidyverse, readxl, gtsummary, dplyr, 
+                  tidyr, ggplot2, rotl, DescTools, stringr, ape, 
+                  emmeans, patchwork, latex2exp, metafor, brms, 
+                  flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
+                  robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
+  
+  # Importing Data Set
+                    data <- read.csv("./Complex_Final_Data.csv")
+                data$obs <- 1:nrow(data)
+    data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
+              data$phylo <- data$Scientific_Name
+        data$vert_invert <- ifelse(data$Phylum == "Chordata" , "Vertebrate", "Invertebrate")
+  
+  # Phylogenetic covariance matrix
+            tree <- ape::read.tree("./Complex_tree")
+             phy <- ape::compute.brlen(tree, method = "Grafen", power = 1)
+               A <- ape::vcv.phylo(phy)
+    row.names(A) <- colnames(A) <- row.names(A)
+           A_cor <- ape::vcv.phylo(phy, corr = TRUE)
+  
+  # Variance Matrix (Shared Control)
+             VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
+  
+  # Periods used in different studies 
+      sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
+                                                                    per = n/44*100) 
 
-# Clean working space and load packages
-  rm(list = ls())
-  if (!require("pacman")) install.packages("pacman")
-  if (!require("devtools")) install.packages("devtools")
-  if (!require("metaAidR")) devtools::install_github("daniel1noble/metaAidR", force = TRUE)
-  if (!require("orchaRd")) remotes::install_github("daniel1noble/orchaRd", dependencies = TRUE, force = TRUE)
-  pacman::p_load(tidyverse, readxl, gtsummary, dplyr, 
-                tidyr, ggplot2, rotl, DescTools, stringr, ape, 
-                emmeans, patchwork, latex2exp, metafor, brms, 
-                flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
-                robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
-
-# Importing Data Set
-                  data <- read.csv("./Complex_Final_Data.csv")
-              data$obs <- 1:nrow(data)
-  data$Scientific_Name <- sub(" ", "_", data$Scientific_Name)
-            data$phylo <- data$Scientific_Name
-      data$vert_invert <- ifelse(data$Phylum == "Chordata" , "Vertebrate", "Invertebrate")
-
-# Phylogenetic covariance matrix
-          tree <- ape::read.tree("./Complex_tree")
-           phy <- ape::compute.brlen(tree, method = "Grafen", power = 1)
-             A <- ape::vcv.phylo(phy)
-  row.names(A) <- colnames(A) <- row.names(A)
-         A_cor <- ape::vcv.phylo(phy, corr = TRUE)
-
-# Variance Matrix (Shared Control)
-           VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
-
-# Periods used in different studies 
-    sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
-                                                                  per = n/44*100) 
 
 ##### Overall Model #####
 run <- TRUE
@@ -54,7 +55,7 @@ Overall_Model_Estimates <- data.frame(estimate = Overall_Model$b,
 Overall_Model_i2 <- data.frame(round(orchaRd::i2_ml(Overall_Model), 2))
 
 
-#### Overall Model - Fluctuation Amplitude Meta-Regression ####
+##### Overall Model - Fluctuation Amplitude Meta-Regression ####
 run <- TRUE
 system.time(
   if(run){
@@ -101,7 +102,7 @@ Amplitude_Plot <- ggplot(Plot_Data, aes(x = Fluctuation_Magnitude, y = InRR_Tran
 
 Amplitude_Plot
 
-#### Overall Model - Type of Fluctuation Meta-Regression ####
+##### Overall Model - Type of Fluctuation Meta-Regression ####
 Fluctuation_Data <- data %>% filter(!is.na(Fluctuation_Category))
 
 Fluctuation_Exploration <- Fluctuation_Data %>% select("Fluctuation_Category") %>% table() %>% data.frame()
@@ -237,8 +238,8 @@ density_fluctuation <- fluctuation_table %>% mutate(name = fct_relevel(name, Flu
                                       x = -0.4, y = (seq(1, dim(fluctuation_table)[1], 1)+0.4)), size = 3.5)
 density_fluctuation
 
-#### ORCHARD PLOT VERSION ####
-# Figure 7 in main paper
+##### Figure 5 ####
+
 my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
                               axis.text.x = element_text(margin = margin(b = 5), size = 16), 
                               axis.ticks = element_blank(),
@@ -264,7 +265,7 @@ density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID
                   paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
                  x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
-  ggsave(filename = "./output/figs/fig7.png", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
+  ggsave(filename = "./output/figs/fig5.png", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
   
 ##--------------------------------------------##
 
@@ -415,7 +416,7 @@ trait_raw_df <- data.frame("Model" = trait_raw_name,
 
   density_trait
 
-## Overall model - Plasticity_Mechanism Meta-Regression ##
+##### Overall model - Plasticity_Mechanism Meta-Regression #####
 plasticity_mec_data  <- data %>%  filter(Trait_Category != "Population")
 
 Individual_Species <- Individual_Subset_Data %>% select("phylo") %>% unique()
@@ -452,7 +453,7 @@ PlasticityMechanism_Model_Estimates <- data.frame(estimate = PlasticityMechanism
 plasticity_mechanism_dat <- plasticity_mec_data %>% group_by(Plasticity_Mechanism) %>% summarise(group_no = length(unique(Study_ID)), spp = length(unique(phylo)), k = n())  %>% cbind(PlasticityMechanism_Model_Estimates) 
 rownames(plasticity_mechanism_dat) <- plasticity_mechanism_dat$Plasticity_Mechanism
 
-### OrchaRd Plot Version ###
+##### Figure 6 #####
 
 density_plasticiyMechanism_orchard <- orchard_plot(PlasticityMechanism_Model, group = "Study_ID", mod = "Plasticity_Mechanism", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
@@ -466,9 +467,8 @@ density_plasticiyMechanism_orchard <- orchard_plot(PlasticityMechanism_Model, gr
                                     paste(format(round(mean(exp(plasticity_mechanism_dat["Developmental Plasticity", "estimate"])-1)*100, 2), nsmall = 2), "%")), x = c(1,2)+0.1, y = -0.15, size = 6) + 
                   geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Developmental Plasticity" = "Development"))
 
-  ggsave(filename = "./output/figs/fig8.png", density_plasticiyMechanism_orchard, width = 8.825, height =  7.200)
+  ggsave(filename = "./output/figs/fig6.png", density_plasticiyMechanism_orchard, width = 8.825, height =  7.200)
 
-  ##--------------------------------------------##
 
 
 
@@ -618,7 +618,8 @@ density_specific_trait <- specific_trait_table %>% mutate(name = fct_relevel(nam
 
 density_specific_trait
 
-### ORCHARD PLOT VERSION MERGING 4 and 5 ###
+
+##### Figure 3  #####
 
 density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
@@ -657,11 +658,11 @@ density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "St
 
   size = 24
   position = "topleft"
-  fig4_5 <- (density_trait_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_specific_trait_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
+  fig3 <- (density_trait_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_specific_trait_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
 
-  ggsave(filename = "./output/figs/fig4_5.png", fig4_5, width = 13.7125, height =  7.4125)
+  ggsave(filename = "./output/figs/fig3.png", fig3, width = 13.7125, height =  7.4125)
 
-#### -------------------------------------------- ####
+
 
 ##### Overall Model - Invert/Vert Meta-Regression #####
 vert_invert_Exploration <- data %>% select("vert_invert") %>% table() %>% data.frame()
@@ -717,13 +718,12 @@ habitat_Model_Estimates <- data.frame(habitat = substr(row.names(habitat_Model_r
 rownames(habitat_Model_Estimates) <- NULL
 habitat_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(habitat_Model_rob), 2))
 
-# Orchard plot preparation
+##### Figure 4 #####
 
   invert_vert_table <- data  %>% group_by(vert_invert) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(vert_invert_Model_Estimates[,-1])
 
   habitat_table <- data  %>% group_by(Ecosystem) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(habitat_Model_Estimates[,-1])
                                 
-### OCHARD PLOT VERSION ###
 
 density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
                   my_theme() + 
@@ -754,11 +754,9 @@ density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID
 
  size = 24
   position = "topleft"
-  fig6 <- (density_habitat_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_vert_invert_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
+  fig4 <- (density_habitat_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_vert_invert_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
 
-  ggsave(filename = "./output/figs/fig6.png", fig6, width = 11.9125, height =  8.049383)
-
-####--------------------------------------------####
+  ggsave(filename = "./output/figs/fig4.png", fig4, width = 11.9125, height =  8.049383)
 
 ##### Individual-Level Trait Subset Model #####
 Individual_Subset_Data <- data %>% filter(Trait_Category != "Population")
@@ -788,7 +786,7 @@ Individual_Model_rob <- robust(Individual_Model, cluster = Individual_Subset_Dat
 Individual_Model_Estimates <- data.frame(estimate = Individual_Model$b, ci.lb = Individual_Model$ci.lb, ci.ub = Individual_Model$ci.ub)
 Individual_Model_i2 <- data.frame(round(orchaRd::i2_ml(Individual_Model), 2))
 
-### ORCHARD PLOT VERSION ###
+##### Figure 2 #####
 density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
                       annotate('text',  x =1+0.1, y = 0.18,
                        label= paste("italic(k)==", dim(data)[1], "~","(", length(unique(data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
@@ -802,14 +800,11 @@ indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", 
                   annotate('text', label= paste(format(round(mean(exp(Individual_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
                  x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "")) 
 
-fig3 <- (density_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))  | indivdual_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
+fig2 <- (density_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))  | indivdual_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
 
-ggsave(filename = "./output/figs/fig3.png", , width = 11.2, height =  5.8)
-#####--------------------------------------------#####
-
+ggsave(filename = "./output/figs/fig2.png", , width = 11.2, height =  5.8)
 
 
-######### Figures and Tables in Supplement ##############
 #### Individual-Level Subset Model - Fluctuation Amplitude Meta-Regression ####
 run <- TRUE
 system.time(
