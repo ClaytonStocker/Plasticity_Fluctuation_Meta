@@ -100,8 +100,6 @@ Amplitude_Plot <- ggplot(Plot_Data, aes(x = Fluctuation_Magnitude, y = InRR_Tran
                   coord_cartesian(xlim = c(0, 25), 
                                   ylim = c(-0.25, 0.25))
 
-Amplitude_Plot
-
 ##### Overall Model - Type of Fluctuation Meta-Regression ####
 Fluctuation_Data <- data %>% filter(!is.na(Fluctuation_Category))
 
@@ -810,14 +808,15 @@ run <- TRUE
 system.time(
   if(run){
     Individual_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_VCV, test = "t", dfs = "contain",
-                                                  mods = ~ Fluctuation_Magnitude - 1,
+                                                  mods = ~ Fluctuation_Magnitude,
                                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
                                                   R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE, 
                                                   control=list(rel.tol=1e-9))
     saveRDS(Individual_Amplitude_Model, "./output/models/Complex_Individual_Amplitude_Model.rds")
   } else {
-    Individual_Amplitude_Model <- readRDS("./output/models/Complex_Individual_Amplitude_Model.rds")})
+    Individual_Amplitude_Model <- readRDS("./output/models/Complex_Individual_Amplitude_Model.rds")
+    })
 
 Individual_Amplitude_Model_rob <- robust(Individual_Amplitude_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -853,7 +852,6 @@ Individual_Amplitude_Plot <- ggplot(Individual_Plot_Data, aes(x = Fluctuation_Ma
                              coord_cartesian(xlim = c(0, 25), 
                                              ylim = c(-0.25, 0.25))
 
-Individual_Amplitude_Plot
 
 #### Individual-Level Subset Model - Type of Fluctuation Meta-Regression ####
 Individual_Fluctuation_Data <- Individual_Subset_Data %>% filter(!is.na(Fluctuation_Category))
@@ -1142,7 +1140,7 @@ run <- TRUE
 system.time(
   if(run){
     Aquatic_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_VCV, test = "t", dfs = "contain",
-                                               mods = ~ Fluctuation_Magnitude - 1,
+                                               mods = ~ Fluctuation_Magnitude,
                                                random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
                                                R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
@@ -1184,8 +1182,6 @@ Aquatic_Amplitude_Plot <- ggplot(Aquatic_Plot_Data, aes(x = Fluctuation_Magnitud
                                        parse = TRUE) +
                           coord_cartesian(xlim = c(0, 25), 
                                           ylim = c(-0.25, 0.25))
-
-Aquatic_Amplitude_Plot
 
 #### Aquatic Subset Model - Type of Fluctuation Meta-Regression ####
 Aquatic_Fluctuation_Data <- Aquatic_Subset_Data %>% filter(!is.na(Fluctuation_Category))
@@ -1565,7 +1561,8 @@ system.time(
                                          control=list(rel.tol=1e-9))
     saveRDS(Terrestrial_Model, "./output/models/Complex_Terrestrial_Model.rds")
   } else {
-    Terrestrial_Model <- readRDS("./output/models/Complex_Terrestrial_Model.rds")})
+    Terrestrial_Model <- readRDS("./output/models/Complex_Terrestrial_Model.rds")
+    })
 
 Terrestrial_Model_rob <- robust(Terrestrial_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1577,14 +1574,15 @@ run <- TRUE
 system.time(
   if(run){
     Terrestrial_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_VCV, test = "t", dfs = "contain",
-                                                   mods = ~ Fluctuation_Magnitude - 1,
+                                                   mods = ~ Fluctuation_Magnitude,
                                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                                    R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
                                                    control=list(rel.tol=1e-9))
     saveRDS(Terrestrial_Amplitude_Model, "./output/models/Complex_Terrestrial_Amplitude_Model.rds")
   } else {
-    Terrestrial_Amplitude_Model <- readRDS("./output/models/Complex_Terrestrial_Amplitude_Model.rds")})
+    Terrestrial_Amplitude_Model <- readRDS("./output/models/Complex_Terrestrial_Amplitude_Model.rds")
+    })
 
 Terrestrial_Amplitude_Model_rob <- robust(Terrestrial_Amplitude_Model, cluster = Terrestrial_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -1619,8 +1617,6 @@ Terrestrial_Amplitude_Plot <- ggplot(Terrestrial_Plot_Data, aes(x = Fluctuation_
                                            parse = TRUE) +
                               coord_cartesian(xlim = c(0, 25), 
                                               ylim = c(-0.25, 0.25))
-
-Terrestrial_Amplitude_Plot
 
 #### Terrestrial Subset Model - Type of Fluctuation Meta-Regression ####
 Terrestrial_Fluctuation_Data <- Terrestrial_Subset_Data %>% filter(!is.na(Fluctuation_Category))
@@ -2156,7 +2152,8 @@ system.time(
                                          control=list(rel.tol=1e-9))
     saveRDS(Acclimation_Model, "./output/models/Complex_Acclimation_Model.rds")
   } else {
-    Acclimation_Model <- readRDS("./output/models/Complex_Acclimation_Model.rds")})
+    Acclimation_Model <- readRDS("./output/models/Complex_Acclimation_Model.rds")
+    })
 
 Acclimation_Model_rob <- robust(Acclimation_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2175,7 +2172,8 @@ system.time(
                                                    control=list(rel.tol=1e-9))
     saveRDS(Acclimation_Amplitude_Model, "./output/models/Complex_Acclimation_Amplitude_Model.rds")
   } else {
-    Acclimation_Amplitude_Model <- readRDS("./output/models/Complex_Acclimation_Amplitude_Model.rds")})
+    Acclimation_Amplitude_Model <- readRDS("./output/models/Complex_Acclimation_Amplitude_Model.rds")
+    })
 
 Acclimation_Amplitude_Model_rob <- robust(Acclimation_Amplitude_Model, cluster = Acclimation_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2210,8 +2208,6 @@ Acclimation_Amplitude_Plot <- ggplot(Acclimation_Plot_Data, aes(x = Fluctuation_
                                            parse = TRUE) +
                               coord_cartesian(xlim = c(0, 25), 
                                               ylim = c(-0.25, 0.25))
-
-Acclimation_Amplitude_Plot
 
 #### Acclimation Subset Model - Exposure Time Meta-Regression ####
 run <- TRUE
@@ -2943,7 +2939,8 @@ system.time(
                                            control=list(rel.tol=1e-9))
     saveRDS(Developmental_Model, "./output/models/Complex_Developmental_Model.rds")
   } else {
-    Developmental_Model <- readRDS("./output/models/Complex_Developmental_Model.rds")})
+    Developmental_Model <- readRDS("./output/models/Complex_Developmental_Model.rds")
+    })
 
 Developmental_Model_rob <- robust(Developmental_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2962,7 +2959,8 @@ system.time(
                                                      control=list(rel.tol=1e-9))
     saveRDS(Developmental_Amplitude_Model, "./output/models/Complex_Developmental_Amplitude_Model.rds")
   } else {
-    Developmental_Amplitude_Model <- readRDS("./output/models/Complex_Developmental_Amplitude_Model.rds")})
+    Developmental_Amplitude_Model <- readRDS("./output/models/Complex_Developmental_Amplitude_Model.rds")
+    })
 
 Developmental_Amplitude_Model_rob <- robust(Developmental_Amplitude_Model, cluster = Developmental_Subset_Data$Study_ID, adjust = TRUE)
 
@@ -2997,8 +2995,6 @@ Developmental_Amplitude_Plot <- ggplot(Developmental_Plot_Data, aes(x = Fluctuat
                                                  parse = TRUE) +
                                 coord_cartesian(xlim = c(0, 25), 
                                                 ylim = c(-0.25, 0.25))
-
-Developmental_Amplitude_Plot
 
 #### Developmental Subset Model - Type of Fluctuation Meta-Regression ####
 Developmental_Fluctuation_Data <- Developmental_Subset_Data %>% filter(!is.na(Fluctuation_Category))
@@ -3765,6 +3761,14 @@ density_intercept <- intercept_table %>% mutate(name = fct_relevel(name, Interce
                                             paste(format(round(mean(exp(Overall_Model_Estimates$estimate)-1)*100, 2), nsmall = 2), "%")), 
                                x = -0.4, y = (seq(1, dim(intercept_table)[1], 1)+0.4)), size = 3.5)
 density_intercept
+
+#### Figure 7 ####
+
+size = 16
+position = "topleft"
+t <-  function() {theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))}
+
+fig7 <- (Amplitude_Plot + t() | Individual_Amplitude_Plot + t() | Aquatic_Amplitude_Plot + t()) / (Terrestrial_Amplitude_Plot + t()| Acclimation_Amplitude_Plot + t() | Developmental_Amplitude_Plot+ t() ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
 
 ####################################################################
 ##### Supplementary Material Tables #####
