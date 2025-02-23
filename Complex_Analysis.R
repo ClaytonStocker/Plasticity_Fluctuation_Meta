@@ -2193,14 +2193,14 @@ Acclimation_Plot_Data <- Acclimation_Plot_Data %>% mutate(n_category = ifelse(n_
 Acclimation_Amplitude_Plot <- ggplot(Acclimation_Plot_Data, aes(x = Fluctuation_Magnitude, y = InRR_Transformed)) + 
                               geom_point(aes(x = Fluctuation_Magnitude, y = InRR_Transformed, 
                                              size = fct_relevel(n_category, c("10", "20", "30", "> 30"))), 
-                                             shape = 21, fill = "#4292c6", alpha = 0.5, show.legend = FALSE) + 
+                                             shape = 21, fill = "#4292c6", alpha = 0.5, show.legend = TRUE) + 
                               labs(x = "Fluctuation Amplitude (\u00B0C)", y = expression("Effect Size (PRRD"["S"]*")"), 
                                    size = "Sample Size", title = "Acclimation Treatments") +
                               theme_bw() +
                               theme(plot.title = element_text(size = 12, colour ="black", face = "bold", hjust = 0.5, margin = margin(b = 10))) +
                               theme(axis.text.y = element_text(size = 10, colour ="black", margin = margin(l = 5))) +
                               theme(axis.text.x = element_text(size = 10, colour ="black", margin = margin(b = 10))) +
-                              #theme(legend.position = "bottom", legend.direction = "horizontal") + 
+                              theme(legend.position = "bottom", legend.direction = "horizontal") + 
                               geom_hline(yintercept = Acclimation_Model_Estimates$estimate, lty = 2) + 
                               geom_smooth(method = "lm", linewidth = 1, se = F, colour = "#084594") +
                               stat_poly_eq(formula = y ~ x, 
@@ -2987,14 +2987,14 @@ Developmental_Amplitude_Plot <- ggplot(Developmental_Plot_Data, aes(x = Fluctuat
                                 theme(plot.title = element_text(size = 12, colour ="black", face = "bold", hjust = 0.5, margin = margin(b = 10))) +
                                 theme(axis.text.y = element_text(size = 10, colour ="black", margin = margin(l = 5))) +
                                 theme(axis.text.x = element_text(size = 10, colour ="black", margin = margin(b = 10))) +
-                                #theme(legend.position = "bottom", legend.direction = "horizontal") + 
+                                theme(legend.position = "bottom", legend.direction = "horizontal") + 
                                 geom_hline(yintercept = Developmental_Model_Estimates$estimate, lty = 2) + 
                                 geom_smooth(method = "lm", linewidth = 1, se = F, colour = "#084594") +
                                 stat_poly_eq(formula = y ~ x, 
                                              aes(label = paste(after_stat(eq.label), after_stat(rr.label), sep = "~~~")), 
                                                  parse = TRUE) +
                                 coord_cartesian(xlim = c(0, 25), 
-                                                ylim = c(-0.25, 0.25))
+                                                ylim = c(-0.25, 0.25)) 
 
 #### Developmental Subset Model - Type of Fluctuation Meta-Regression ####
 Developmental_Fluctuation_Data <- Developmental_Subset_Data %>% filter(!is.na(Fluctuation_Category))
@@ -3764,9 +3764,9 @@ density_intercept
 
 #### Figure 7 ####
 
-size = 16
+    size = 16
 position = "topleft"
-t <-  function() {theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))}
+      t <-  function() {theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))}
 
 fig7 <- (Amplitude_Plot + t() | Individual_Amplitude_Plot + t() | Aquatic_Amplitude_Plot + t()) / (Terrestrial_Amplitude_Plot + t()| Acclimation_Amplitude_Plot + t() | Developmental_Amplitude_Plot+ t() ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
 
