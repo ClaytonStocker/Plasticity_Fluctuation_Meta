@@ -32,6 +32,7 @@
       sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
                                                                     per = n/44*100) 
 
+##### Calculate Effect sizes #####
 
 ##### Overall Model #####
 run <- TRUE
