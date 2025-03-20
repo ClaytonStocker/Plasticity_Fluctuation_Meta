@@ -55,7 +55,7 @@ PRRD <- function(t1, t2, t1_c, t2_c, t1_f, t2_f, sd_t1_c, sd_t2_c, sd_t1_f, sd_t
   
   # Effect size calculation
   if (type == 'ef') { 
-    prrd <- ((log(t2_c) - log(t1_c)) - (log(t2_f) - log(t1_f))) / (t2 - t1)
+    prrd <- ((log(t2_f) - log(t1_f)) - (log(t2_c) - log(t1_c))) / (t2 - t1)
     return(prrd)
   }
   
