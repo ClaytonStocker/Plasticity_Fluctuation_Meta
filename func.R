@@ -47,9 +47,6 @@ PRRD <- function(t1, t2, t1_c, t2_c, t1_f, t2_f, sd_t1_c, sd_t2_c, sd_t1_f, sd_t
   if (any(c(t1_c, t2_c, t1_f, t2_f) <= 0)) {
     stop("All mean values must be positive to compute log response ratios.")
   }
-  if (t2 == t1) {
-    stop("t2 and t1 must be different to avoid division by zero.")
-  }
   
   inv_temp_diff2 <- 1 / (t2 - t1)^2  # Precompute for efficiency
   
