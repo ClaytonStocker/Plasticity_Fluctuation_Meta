@@ -1073,7 +1073,7 @@ rownames(Aquatic_Plasticity_Study_Count) <- Aquatic_Plasticity_Study_Count$Plast
 run <- TRUE
 system.time(
   if(run){
-    Aquatic_Plasticity_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_VCV, test = "t", dfs = "contain",
+    Aquatic_Plasticity_Model <- metafor::rma.mv(PRRD, V = Aquatic_VCV, test = "t", dfs = "contain",
                                                 mods = ~ Plasticity_Mechanism - 1,
                                                 random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                               ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1176,12 +1176,12 @@ Terrestrial_A_cor <- as.data.frame(A_cor)
 Terrestrial_A_cor <- Terrestrial_A_cor[c(Terrestrial_Species$phylo), c(Terrestrial_Species$phylo)]
 Terrestrial_A_cor <- as.matrix(Terrestrial_A_cor)
 
-Terrestrial_VCV <- make_VCV_matrix(Terrestrial_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Terrestrial_VCV <- make_VCV_matrix(Terrestrial_Subset_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Terrestrial_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Terrestrial_VCV, test = "t", dfs = "contain",
+    Terrestrial_Model <- metafor::rma.mv(PRRD ~ 1, V = Terrestrial_VCV, test = "t", dfs = "contain",
                                          random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Terrestrial_A_cor), data = Terrestrial_Subset_Data, method = "REML", sparse = TRUE, 
@@ -1200,7 +1200,7 @@ Terrestrial_Model_i2 <- data.frame(round(orchaRd::i2_ml(Terrestrial_Model), 2))
 run <- TRUE
 system.time(
   if(run){
-    Terrestrial_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_VCV, test = "t", dfs = "contain",
+    Terrestrial_Amplitude_Model <- metafor::rma.mv(PRRD, V = Terrestrial_VCV, test = "t", dfs = "contain",
                                                    mods = ~ Fluctuation_Magnitude,
                                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1267,12 +1267,12 @@ Terrestrial_Fluctuation_A_cor <- as.data.frame(A_cor)
 Terrestrial_Fluctuation_A_cor <- Terrestrial_Fluctuation_A_cor[c(Terrestrial_Fluctuation_Species$phylo), c(Terrestrial_Fluctuation_Species$phylo)]
 Terrestrial_Fluctuation_A_cor <- as.matrix(Terrestrial_Fluctuation_A_cor)
 
-Terrestrial_Fluctuation_VCV <- make_VCV_matrix(Terrestrial_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Terrestrial_Fluctuation_VCV <- make_VCV_matrix(Terrestrial_Fluctuation_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Terrestrial_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_Fluctuation_VCV, test = "t", dfs = "contain",
+    Terrestrial_Fluctuation_Model <- metafor::rma.mv(PRRD, V = Terrestrial_Fluctuation_VCV, test = "t", dfs = "contain",
                                                      mods = ~ Fluctuation_Category - 1,
                                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1399,12 +1399,12 @@ Terrestrial_Trait_A_cor <- as.data.frame(A_cor)
 Terrestrial_Trait_A_cor <- Terrestrial_Trait_A_cor[c(Terrestrial_Trait_Species$phylo), c(Terrestrial_Trait_Species$phylo)]
 Terrestrial_Trait_A_cor <- as.matrix(Terrestrial_Trait_A_cor)
 
-Terrestrial_Trait_VCV <- make_VCV_matrix(Terrestrial_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Terrestrial_Trait_VCV <- make_VCV_matrix(Terrestrial_Trait_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Terrestrial_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_Trait_VCV, test = "t", dfs = "contain",
+    Terrestrial_Trait_Model <- metafor::rma.mv(PRRD, V = Terrestrial_Trait_VCV, test = "t", dfs = "contain",
                                                mods = ~ Trait_Category - 1,
                                                random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1532,7 +1532,7 @@ rownames(Terrestrial_Plasticity_Study_Count) <- Terrestrial_Plasticity_Study_Cou
 run <- TRUE
 system.time(
   if(run){
-    Terrestrial_Plasticity_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_VCV, test = "t", dfs = "contain",
+    Terrestrial_Plasticity_Model <- metafor::rma.mv(PRRD, V = Terrestrial_VCV, test = "t", dfs = "contain",
                                                     mods = ~ Plasticity_Mechanism - 1,
                                                     random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1650,12 +1650,12 @@ Terrestrial_Specific_Trait_A_cor <- as.data.frame(A_cor)
 Terrestrial_Specific_Trait_A_cor <- Terrestrial_Specific_Trait_A_cor[c(Terrestrial_Specific_Trait_Species$phylo), c(Terrestrial_Specific_Trait_Species$phylo)]
 Terrestrial_Specific_Trait_A_cor <- as.matrix(Terrestrial_Specific_Trait_A_cor)
 
-Terrestrial_Specific_Trait_VCV <- make_VCV_matrix(Terrestrial_Specific_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Terrestrial_Specific_Trait_VCV <- make_VCV_matrix(Terrestrial_Specific_Trait_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Terrestrial_Specific_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Terrestrial_Specific_Trait_VCV, test = "t", dfs = "contain",
+    Terrestrial_Specific_Trait_Model <- metafor::rma.mv(PRRD, V = Terrestrial_Specific_Trait_VCV, test = "t", dfs = "contain",
                                                         mods = ~ Measurement - 1,
                                                         random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                       ~1|Shared_Animal_Number), 
@@ -1767,12 +1767,12 @@ Acclimation_A_cor <- as.data.frame(A_cor)
 Acclimation_A_cor <- Acclimation_A_cor[c(Acclimation_Species$phylo), c(Acclimation_Species$phylo)]
 Acclimation_A_cor <- as.matrix(Acclimation_A_cor)
 
-Acclimation_VCV <- make_VCV_matrix(Acclimation_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Acclimation_VCV <- make_VCV_matrix(Acclimation_Subset_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Acclimation_VCV, test = "t", dfs = "contain",
+    Acclimation_Model <- metafor::rma.mv(PRRD ~ 1, V = Acclimation_VCV, test = "t", dfs = "contain",
                                          random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
                                          R = list(phylo=Acclimation_A_cor), data = Acclimation_Subset_Data, method = "REML", sparse = TRUE, 
@@ -1791,7 +1791,7 @@ Acclimation_Model_i2 <- data.frame(round(orchaRd::i2_ml(Acclimation_Model), 2))
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_VCV, test = "t", dfs = "contain",
+    Acclimation_Amplitude_Model <- metafor::rma.mv(PRRD, V = Acclimation_VCV, test = "t", dfs = "contain",
                                                    mods = ~ Fluctuation_Magnitude - 1,
                                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1840,7 +1840,7 @@ Acclimation_Amplitude_Plot <- ggplot(Acclimation_Plot_Data, aes(x = Fluctuation_
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Exposure_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_VCV, test = "t", dfs = "contain",
+    Acclimation_Exposure_Model <- metafor::rma.mv(PRRD, V = Acclimation_VCV, test = "t", dfs = "contain",
                                                   mods = ~ Acclimation_Exposure_Time - 1,
                                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1894,12 +1894,12 @@ Acclimation_Frequency_A_cor <- as.data.frame(A_cor)
 Acclimation_Frequency_A_cor <- Acclimation_Frequency_A_cor[c(Acclimation_Frequency_Species$phylo), c(Acclimation_Frequency_Species$phylo)]
 Acclimation_Frequency_A_cor <- as.matrix(Acclimation_Frequency_A_cor)
 
-Acclimation_Frequency_VCV <- make_VCV_matrix(Acclimation_Frequency_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Acclimation_Frequency_VCV <- make_VCV_matrix(Acclimation_Frequency_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Frequency_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Frequency_VCV, test = "t", dfs = "contain",
+    Acclimation_Frequency_Model <- metafor::rma.mv(PRRD, V = Acclimation_Frequency_VCV, test = "t", dfs = "contain",
                                                    mods = ~ Number_Of_Fluctuations - 1,
                                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1924,8 +1924,8 @@ Acclimation_Frequency_Plot_Data <- Acclimation_Frequency_Plot_Data %>% mutate(n_
 
 # Graph Code
 
-Acclimation_Frequency_Plot <- ggplot(Acclimation_Frequency_Plot_Data, aes(x = Number_Of_Fluctuations, y = InRR_Transformed)) + 
-                              geom_point(aes(x = Number_Of_Fluctuations, y = InRR_Transformed, 
+Acclimation_Frequency_Plot <- ggplot(Acclimation_Frequency_Plot_Data, aes(x = Number_Of_Fluctuations, y = PRRD)) + 
+                              geom_point(aes(x = Number_Of_Fluctuations, y = PRRD, 
                                              size = fct_relevel(n_category, c("10", "20", "30", "> 30"))), 
                                              shape = 21, fill = "#4292c6", alpha = 0.5) + 
                               labs(x = "Number of Fluctuations", y = expression("Effect Size (PRRD"["S"]*")"), 
@@ -1968,12 +1968,12 @@ Acclimation_Fluctuation_A_cor <- as.data.frame(A_cor)
 Acclimation_Fluctuation_A_cor <- Acclimation_Fluctuation_A_cor[c(Acclimation_Fluctuation_Species$phylo), c(Acclimation_Fluctuation_Species$phylo)]
 Acclimation_Fluctuation_A_cor <- as.matrix(Acclimation_Fluctuation_A_cor)
 
-Acclimation_Fluctuation_VCV <- make_VCV_matrix(Acclimation_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Acclimation_Fluctuation_VCV <- make_VCV_matrix(Acclimation_Fluctuation_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Fluctuation_VCV, test = "t", dfs = "contain",
+    Acclimation_Fluctuation_Model <- metafor::rma.mv(PRRD, V = Acclimation_Fluctuation_VCV, test = "t", dfs = "contain",
                                                      mods = ~ Fluctuation_Category - 1,
                                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -2092,12 +2092,12 @@ Acclimation_Trait_A_cor <- as.data.frame(A_cor)
 Acclimation_Trait_A_cor <- Acclimation_Trait_A_cor[c(Acclimation_Trait_Species$phylo), c(Acclimation_Trait_Species$phylo)]
 Acclimation_Trait_A_cor <- as.matrix(Acclimation_Trait_A_cor)
 
-Acclimation_Trait_VCV <- make_VCV_matrix(Acclimation_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Acclimation_Trait_VCV <- make_VCV_matrix(Acclimation_Trait_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Trait_VCV, test = "t", dfs = "contain",
+    Acclimation_Trait_Model <- metafor::rma.mv(PRRD, V = Acclimation_Trait_VCV, test = "t", dfs = "contain",
                                                mods = ~ Trait_Category - 1,
                                                random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -2212,12 +2212,12 @@ Acclimation_Stage_A_cor <- as.data.frame(A_cor)
 Acclimation_Stage_A_cor <- Acclimation_Stage_A_cor[c(Acclimation_Stage_Species$phylo), c(Acclimation_Stage_Species$phylo)]
 Acclimation_Stage_A_cor <- as.matrix(Acclimation_Stage_A_cor)
 
-Acclimation_Stage_VCV <- make_VCV_matrix(Acclimation_Stage_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Acclimation_Stage_VCV <- make_VCV_matrix(Acclimation_Stage_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Acclimation_Stage_Model <- metafor::rma.mv(InRR_Transformed, V = Acclimation_Stage_VCV, test = "t", dfs = "contain",
+    Acclimation_Stage_Model <- metafor::rma.mv(PRRD, V = Acclimation_Stage_VCV, test = "t", dfs = "contain",
                                                mods = ~ Acclimation_Life.History_Stage_Category - 1,
                                                random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -2321,119 +2321,6 @@ density_acclimation_stage <- acclimation_stage_table %>% mutate(name = fct_relev
 
 density_acclimation_stage
 
-##### Acclimation Subset Model - Class Meta-Regression #####
-Acclimation_Class_Exploration <- Acclimation_Subset_Data %>% select("Class") %>% table() %>% data.frame()
-rownames(Acclimation_Class_Exploration) <- Acclimation_Class_Exploration$Class
-
-Acclimation_Class_Data <- Acclimation_Subset_Data %>% filter(Class != "Clitellata" &
-                                                             Class != "Gastropoda" &
-                                                             Class != "Holothuroidea" &
-                                                             Class != "Malacostraca")
-
-Acclimation_Class_Species_Count <- Acclimation_Class_Data %>% select("Scientific_Name", "Class") %>% table() %>% data.frame() %>% 
-  filter(`Freq` != 0) %>% select("Class") %>% table() %>% data.frame()
-rownames(Acclimation_Class_Species_Count) <- Acclimation_Class_Species_Count$Class
-
-Acclimation_Class_Study_Count <- Acclimation_Class_Data %>% select("Study_ID", "Class") %>% table() %>% data.frame() %>% 
-  filter(`Freq` != 0) %>% select("Class") %>% table() %>% data.frame()
-rownames(Acclimation_Class_Study_Count) <- Acclimation_Class_Study_Count$Class
-
-Acclimation_Class_Species <- Acclimation_Class_Data %>% select("phylo") %>% unique()
-
-Acclimation_Class_A_cor <- as.data.frame(A_cor)
-Acclimation_Class_A_cor <- Acclimation_Class_A_cor[c(Acclimation_Class_Species$phylo), c(Acclimation_Class_Species$phylo)]
-Acclimation_Class_A_cor <- as.matrix(Acclimation_Class_A_cor)
-
-Acclimation_Class_VCV <- make_VCV_matrix(Acclimation_Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
-
-run <- TRUE
-system.time(
-  if(run){
-    Acclimation_Class_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Acclimation_Class_VCV, test = "t", dfs = "contain",
-                                               random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
-                                                             ~1|Shared_Animal_Number, ~1|Measurement), 
-                                               R = list(phylo=Acclimation_Class_A_cor), data = Acclimation_Class_Data, method = "REML", sparse = TRUE, 
-                                               control=list(rel.tol=1e-9))
-    saveRDS(Acclimation_Class_Model, "./output/models/Complex_Acclimation_Class_Model.rds")
-  } else {
-    Acclimation_Class_Model <- readRDS("./output/models/Complex_Acclimation_Class_Model.rds")})
-
-Acclimation_Class_Model_rob <- robust(Acclimation_Class_Model, cluster = Acclimation_Class_Data$Study_ID, adjust = TRUE)
-
-Acclimation_Class_Model_Estimates <- data.frame(Class = substr(row.names(Acclimation_Class_Model$b), 6, 100),
-                                                estimate = Acclimation_Class_Model$b, 
-                                                ci.lb = Acclimation_Class_Model$ci.lb, 
-                                                ci.ub = Acclimation_Class_Model$ci.ub)
-rownames(Acclimation_Class_Model_Estimates) <- c("Insecta")
-Acclimation_Class_Model_i2 <- data.frame(round(orchaRd::i2_ml(Acclimation_Class_Model), 2))
-
-# Preparing Graph
-
-acclimation_class_rnames <- c("Insecta")
-
-acclimation_class_k <- data.frame("k" = c(Acclimation_Class_Exploration["Insecta", "Freq"]), 
-                                  row.names = acclimation_class_rnames)
-
-acclimation_class_group_no <- data.frame("Spp No." = c(Acclimation_Class_Species_Count["Insecta", "Freq"]), 
-                                         row.names = acclimation_class_rnames)
-
-acclimation_class_study <- data.frame("Study" = c(Acclimation_Class_Study_Count["Insecta", "Freq"]), 
-                                      row.names = acclimation_class_rnames)
-
-acclimation_class_table <- data.frame(estimate = Acclimation_Class_Model_Estimates[,"estimate"], 
-                                      lowerCL = Acclimation_Class_Model_Estimates[,"ci.lb"], 
-                                      upperCL = Acclimation_Class_Model_Estimates[,"ci.ub"], 
-                                      K = acclimation_class_k[,1], 
-                                      group_no = acclimation_class_group_no[,1], 
-                                      row.names = acclimation_class_rnames)
-acclimation_class_table$name <- row.names(acclimation_class_table)
-
-acclimation_class_raw_mean <- c(unlist(unname(Acclimation_Class_Data %>% filter(`Class` == "Insecta") %>% 
-                                                select("InRR_Transformed"))))
-
-acclimation_class_raw_name <- c(replicate(31, "Insecta"))
-
-acclimation_class_raw_df <- data.frame("Model" = acclimation_class_raw_name, 
-                                       "Effect" = acclimation_class_raw_mean)
-
-# Graph code
-
-Acclimation_Class_Order <- c("Insecta")
-
-density_acclimation_class <- acclimation_class_table %>% mutate(name = fct_relevel(name, Acclimation_Class_Order)) %>%
-                             ggplot() +
-                             geom_density_ridges(data = acclimation_class_raw_df %>% mutate(Model = fct_relevel(Model, Acclimation_Class_Order)), 
-                                                 aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                     scale = 0.05, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                             geom_linerange(aes(y = rev(seq(1, dim(acclimation_class_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                                size = 1) +
-                             geom_linerange(aes(y = rev(seq(1, dim(acclimation_class_table)[1], 1)), xmin = min(acclimation_class_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
-                                            size = 1) +
-                             geom_linerange(aes(y = rev(seq(1, dim(acclimation_class_table)[1], 1)), xmin = max(acclimation_class_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                            size = 1) +
-                             geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(acclimation_class_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                                 size = 1, fatten = 2) +
-                             theme_bw() +
-                             guides(fill = "none", colour = "none") +
-                             labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                             theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                              vjust = c(-2.7))) +
-                             theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                             theme(axis.ticks = element_blank()) +
-                             theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                             theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                             scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                             scale_colour_manual(values = c("#2B4E7A")) +
-                             scale_fill_manual(values = c("#2B4E7A")) +
-                             coord_cartesian(xlim = c(-0.5, 0.5)) +
-                             annotate('text',  x = 0.5, y = (seq(1, dim(acclimation_class_table)[1], 1)+0.4),
-                             label= paste("italic(k)==", c(acclimation_class_table["Insecta", "K"]), "~","(", 
-                                                         c(acclimation_class_table["Insecta", "group_no"]), 
-                                          ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                             geom_label(aes(label=c(paste(format(round(mean(exp(Acclimation_Class_Model_Estimates["Insecta", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                        x = -0.4, y = (seq(1, dim(acclimation_class_table)[1], 1)+0.4)), size = 3.5)
-
-density_acclimation_class
 
 ##### Acclimation Subset Model - Specific Trait Meta-Regression #####
 Acclimation_Specific_Trait_Exploration <- Acclimation_Subset_Data %>% select("Measurement") %>% table() %>% data.frame()
