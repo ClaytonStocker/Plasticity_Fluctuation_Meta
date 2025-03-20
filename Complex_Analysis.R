@@ -10,6 +10,8 @@
                   emmeans, patchwork, latex2exp, metafor, brms, 
                   flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
                   robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
+
+    source("func.R")
   
   # Importing Data Set
                     data <- read.csv("./Complex_Final_Data.csv")
@@ -25,20 +27,30 @@
     row.names(A) <- colnames(A) <- row.names(A)
            A_cor <- ape::vcv.phylo(phy, corr = TRUE)
   
-  # Variance Matrix (Shared Control)
-             VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
-  
   # Periods used in different studies 
       sum_period <-  data %>% group_by(Fluctuation_Unit)  %>% summarise(n = length(unique(Study_ID)),
                                                                     per = n/44*100) 
 
 ##### Calculate Effect sizes #####
+      
+      data <- data  %>% 
+              mutate(PRRD = PRRD(t1 = T1_constant, t2 = T2_constant, 
+                                t1_c = Mean_T1_C_Add, t2_c = Mean_T2_C_Add, t1_f = Mean_T1_F_Add, t2_f = Mean_T2_F_Add, 
+                                sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
+                               n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'ef'),
+                    v_PRRD = PRRD(t1 = T1_constant, t2 = T2_constant, 
+                                t1_c = Mean_T1_C_Add, t2_c = Mean_T2_C_Add, t1_f = Mean_T1_F_Add, t2_f = Mean_T2_F_Add, 
+                                sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
+                               n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'v'))
+
+ # Variance Matrix (Shared Control)
+             VCV <- make_VCV_matrix(data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 ##### Overall Model #####
 run <- TRUE
 system.time(
   if(run){
-    Overall_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = VCV, test = "t", dfs = "contain",
+    Overall_Model <- metafor::rma.mv(PRRD ~ 1, V = VCV, test = "t", dfs = "contain",
                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
@@ -60,7 +72,7 @@ Overall_Model_i2 <- data.frame(round(orchaRd::i2_ml(Overall_Model), 2))
 run <- TRUE
 system.time(
   if(run){
-    Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = VCV, test = "t", dfs = "contain",
+    Amplitude_Model <- metafor::rma.mv(PRRD, V = VCV, test = "t", dfs = "contain",
                                        mods = ~ Fluctuation_Magnitude,
                                        random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -125,12 +137,12 @@ Fluctuation_A_cor <- as.data.frame(A_cor)
 Fluctuation_A_cor <- Fluctuation_A_cor[c(Fluctuation_Species$phylo), c(Fluctuation_Species$phylo)]
 Fluctuation_A_cor <- as.matrix(Fluctuation_A_cor)
 
-Fluctuation_VCV <- make_VCV_matrix(Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Fluctuation_VCV <- make_VCV_matrix(Fluctuation_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Fluctuation_VCV, test = "t", dfs = "contain",
+    Fluctuation_Model <- metafor::rma.mv(PRRD, V = Fluctuation_VCV, test = "t", dfs = "contain",
                                          mods = ~ Fluctuation_Category - 1,
                                          random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                        ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -193,50 +205,6 @@ fluctuation_raw_name <- c(replicate(80, "Sinusoidal (Sine Curve)"),
 fluctuation_raw_df <- data.frame("Model" = fluctuation_raw_name, 
                                  "Effect" = fluctuation_raw_mean)
 
-# Graph code - Combined
-
-Fluctuation_Order <- c("Stepwise", "Alternating", "Sinusoidal (Sine Curve)")
-
-density_fluctuation <- fluctuation_table %>% mutate(name = fct_relevel(name, Fluctuation_Order)) %>%
-                       ggplot() +
-                       geom_density_ridges(data = fluctuation_raw_df %>% mutate(Model = fct_relevel(Model, Fluctuation_Order)), 
-                                           aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                           scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                       geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                          size = 1) +
-                       geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table)[1], 1)), xmin = min(fluctuation_raw_df$Effect)-0.01, xmax = -1.5, colour = name),
-                                      size = 1) +
-                       geom_linerange(aes(y = rev(seq(1, dim(fluctuation_table)[1], 1)), xmin = max(fluctuation_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                      size = 1) +
-                       geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(fluctuation_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                           size = 1, fatten = 2) +
-                       theme_bw() +
-                       guides(fill = "none", colour = "none") +
-                       labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                       theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                                        vjust = c(-2.7, -2.7, -0.8))) +
-                       theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                       theme(axis.ticks = element_blank()) +
-                       theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                       theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                       scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                       scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#2B4E7A")) +
-                       scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#2B4E7A")) +
-                       coord_cartesian(xlim = c(-0.5, 0.5)) +
-                       annotate('text',  x = 0.5, y = (seq(1, dim(fluctuation_table)[1], 1)+0.4),
-                       label= paste("italic(k)==", c(fluctuation_table["Stepwise", "K"], 
-                                                     fluctuation_table["Alternating", "K"], 
-                                                     fluctuation_table["Sinusoidal (Sine Curve)", "K"]), "~","(", 
-                                                   c(fluctuation_table["Stepwise", "group_no"], 
-                                                     fluctuation_table["Alternating", "group_no"], 
-                                                     fluctuation_table["Sinusoidal (Sine Curve)", "group_no"]), 
-                                    ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                       geom_label(aes(label=c(paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                              paste(format(round(mean(exp(Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                              paste(format(round(mean(exp(Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                      x = -0.4, y = (seq(1, dim(fluctuation_table)[1], 1)+0.4)), size = 3.5)
-density_fluctuation
-
 ##### Figure 5 ####
 
 my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
@@ -246,7 +214,7 @@ my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(
                               legend.title = element_text(size = 16),
                               legend.text = element_text(size = 16), 
                               legend.position = "top",
-                              plot.tag = element_text(size = 16, face = "italic"))
+                              plot.tag = element_text(size = 16, face = "italic")))
                         }
 
 density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
@@ -290,12 +258,12 @@ Trait_A_cor <- as.data.frame(A_cor)
 Trait_A_cor <- Trait_A_cor[c(Trait_Species$phylo), c(Trait_Species$phylo)]
 Trait_A_cor <- as.matrix(Trait_A_cor)
 
-Trait_VCV <- make_VCV_matrix(Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Trait_VCV <- make_VCV_matrix(Trait_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Trait_VCV, test = "t", dfs = "contain",
+    Trait_Model <- metafor::rma.mv(PRRD, V = Trait_VCV, test = "t", dfs = "contain",
                                    mods = ~ Trait_Category - 1,
                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -367,53 +335,57 @@ trait_raw_name <- c(replicate(32, "Biochemical Assay"),
 trait_raw_df <- data.frame("Model" = trait_raw_name, 
                            "Effect" = trait_raw_mean)
 
-# Graph code - Combined OLDER VERSION
 
-  Trait_Order <- c("Physiological", "Morphological", "Life-history Traits", "Biochemical Assay")
+##### Individual-Level Trait Subset Model #####
+Individual_Subset_Data <- data %>% filter(Trait_Category != "Population")
+Individual_Species <- Individual_Subset_Data %>% select("phylo") %>% unique()
 
-  density_trait <- trait_table %>% mutate(name = fct_relevel(name, Trait_Order)) %>%
-                  ggplot() +
-                  geom_density_ridges(data = trait_raw_df %>% mutate(Model = fct_relevel(Model, Trait_Order)), 
-                                      aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                          scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                  geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                      size = 1) +
-                  geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)), xmin = min(trait_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
-                                  size = 1) +
-                  geom_linerange(aes(y = rev(seq(1, dim(trait_table)[1], 1)), xmin = max(trait_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                  size = 1) +
-                  geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                      size = 1, fatten = 2) +
-                  theme_bw() +
-                  guides(fill = "none", colour = "none") +
-                  labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                  theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                    vjust = c(-2.7, -2.7, -0.8, -0.8))) +
-                  theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                  theme(axis.ticks = element_blank()) +
-                  theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                  theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                  scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                  scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
-                  scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
-                  coord_cartesian(xlim = c(-0.5, 0.5)) +
-                  annotate('text',  x = 0.5, y = (seq(1, dim(trait_table)[1], 1)+0.4),
-                  label= paste("italic(k)==", c(trait_table["Physiological", "K"], 
-                                                trait_table["Morphological", "K"], 
-                                                trait_table["Life-history Traits", "K"],
-                                                trait_table["Biochemical Assay", "K"]), "~","(", 
-                                              c(trait_table["Physiological", "group_no"], 
-                                                trait_table["Morphological", "group_no"], 
-                                                trait_table["Life-history Traits", "group_no"],
-                                                trait_table["Biochemical Assay", "group_no"]), 
-                                ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                  geom_label(aes(label=c(paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                          paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                          paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                          paste(format(round(mean(exp(Trait_Model_Estimates["Biochemical Assay", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                  x = -0.4, y = (seq(1, dim(trait_table)[1], 1)+0.4)), size = 3.5)
+Individual_A_cor <- as.data.frame(A_cor)
+Individual_A_cor <- Individual_A_cor[c(Individual_Species$phylo), c(Individual_Species$phylo)]
+Individual_A_cor <- as.matrix(Individual_A_cor)
 
-  density_trait
+Individual_VCV <- make_VCV_matrix(Individual_Subset_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
+
+run <- TRUE
+system.time(
+  if(run){
+    Individual_Model <- metafor::rma.mv(PRRD ~ 1, V = Individual_VCV, test = "t", dfs = "contain",
+                                        random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
+                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
+                                        R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE,
+                                        control=list(rel.tol=1e-9))
+    saveRDS(Individual_Model, "./output/models/Complex_Individual_Model.rds")
+  } else {
+    Individual_Model <- readRDS("./output/models/Complex_Individual_Model.rds")
+    })
+
+Individual_Model_rob <- robust(Individual_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
+
+Individual_Model_Estimates <- data.frame(estimate = Individual_Model$b, ci.lb = Individual_Model$ci.lb, ci.ub = Individual_Model$ci.ub)
+Individual_Model_i2 <- data.frame(round(orchaRd::i2_ml(Individual_Model), 2))
+
+##### Figure 2 #####
+
+density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
+                      annotate('text',  x =1+0.1, y = 0.18,
+                       label= paste("italic(k)==", dim(data)[1], "~","(", length(unique(data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label= paste(format(round(mean(exp(Overall_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                 x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "Overall")) 
+
+
+indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
+                      annotate('text',  x =1+0.1, y = 0.18,
+                       label= paste("italic(k)==", dim(Individual_Subset_Data)[1], "~","(", length(unique(Individual_Subset_Data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
+                  annotate('text', label= paste(format(round(mean(exp(Individual_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
+                 x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "")) 
+
+size = 24
+  position = "topleft"
+fig2 <- (density_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))  | indivdual_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
+
+ggsave(filename = "./output/figs/fig2.png", , width = 11.2, height =  5.8)
+
+
 
 ##### Overall model - Plasticity_Mechanism Meta-Regression #####
 plasticity_mec_data  <- data %>%  filter(Trait_Category != "Population")
@@ -424,12 +396,12 @@ Individual_A_cor <- as.data.frame(A_cor)
 Individual_A_cor <- Individual_A_cor[c(Individual_Species$phylo), c(Individual_Species$phylo)]
 Individual_A_cor <- as.matrix(Individual_A_cor)
 
-Individual_VCV <- make_VCV_matrix(Individual_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Individual_VCV <- make_VCV_matrix(Individual_Subset_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    PlasticityMechanism_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_VCV, test = "t", dfs = "contain",
+    PlasticityMechanism_Model <- metafor::rma.mv(PRRD, V = Individual_VCV, test = "t", dfs = "contain",
                                             mods = ~ Plasticity_Mechanism - 1,
                                             random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                           ~1|Shared_Animal_Number), 
@@ -495,12 +467,12 @@ Specific_Trait_A_cor <- as.data.frame(A_cor)
 Specific_Trait_A_cor <- Specific_Trait_A_cor[c(Specific_Trait_Species$phylo), c(Specific_Trait_Species$phylo)]
 Specific_Trait_A_cor <- as.matrix(Specific_Trait_A_cor)
 
-Specific_Trait_VCV <- make_VCV_matrix(Specific_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Specific_Trait_VCV <- make_VCV_matrix(Specific_Trait_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Specific_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Specific_Trait_VCV, test = "t", dfs = "contain",
+    Specific_Trait_Model <- metafor::rma.mv(PRRD, V = Specific_Trait_VCV, test = "t", dfs = "contain",
                                             mods = ~ Measurement - 1,
                                             random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                           ~1|Shared_Animal_Number), 
@@ -569,55 +541,6 @@ specific_trait_raw_name <- c(replicate(46, "Development Time"),
 specific_trait_raw_df <- data.frame("Model" = specific_trait_raw_name, 
                                     "Effect" = specific_trait_raw_mean)
 
-# Graph code - Combined
-
-Specific_Trait_Order <- c("Metabolic Rate", "Mass", "Length", "Development Time")
-
-density_specific_trait <- specific_trait_table %>% mutate(name = fct_relevel(name, Specific_Trait_Order)) %>%
-                          ggplot() +
-                          geom_density_ridges(data = specific_trait_raw_df %>% mutate(Model = fct_relevel(Model, Specific_Trait_Order)), 
-                                              aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                  scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                          geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                             size = 1) +
-                          geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table)[1], 1)), xmin = min(specific_trait_raw_df$Effect)-0.01, xmax = -1.5, colour = name),
-                                         size = 1) +
-                          geom_linerange(aes(y = rev(seq(1, dim(specific_trait_table)[1], 1)), xmin = max(specific_trait_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                         size = 1) +
-                          geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(specific_trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                              size = 1, fatten = 2) +
-                          theme_bw() +
-                          guides(fill = "none", colour = "none") +
-                          labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                          theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                   vjust = c(-0.8, -2.7, -2.7, -0.8))) +
-                          theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                          theme(axis.ticks = element_blank()) +
-                          theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                          theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                          scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                          scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
-                          scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#3C5F8D", "#2B4E7A")) +
-                          coord_cartesian(xlim = c(-0.5, 0.5)) +
-                          annotate('text',  x = 0.5, y = (seq(1, dim(specific_trait_table)[1], 1)+0.4),
-                          label= paste("italic(k)==", c(specific_trait_table["Metabolic Rate", "K"], 
-                                                        specific_trait_table["Mass", "K"], 
-                                                        specific_trait_table["Length", "K"], 
-                                                        specific_trait_table["Development Time", "K"]), "~","(", 
-                                                      c(specific_trait_table["Metabolic Rate", "group_no"], 
-                                                        specific_trait_table["Mass", "group_no"], 
-                                                        specific_trait_table["Length", "group_no"], 
-                                                        specific_trait_table["Development Time", "group_no"]), 
-                                       ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                          geom_label(aes(label=c(paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Metabolic Rate", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                                 paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Mass", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                                 paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Length", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                                 paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Development Time", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                         x = -0.4, y = (seq(1, dim(specific_trait_table)[1], 1)+0.4)), size = 3.5)
-
-density_specific_trait
-
-
 ##### Figure 3  #####
 
 density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
@@ -661,8 +584,6 @@ density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "St
 
   ggsave(filename = "./output/figs/fig3.png", fig3, width = 13.7125, height =  7.4125)
 
-
-
 ##### Overall Model - Invert/Vert Meta-Regression #####
 vert_invert_Exploration <- data %>% select("vert_invert") %>% table() %>% data.frame()
 rownames(vert_invert_Exploration) <- vert_invert_Exploration$vert_invert
@@ -670,7 +591,7 @@ rownames(vert_invert_Exploration) <- vert_invert_Exploration$vert_invert
 run <- TRUE
 system.time(
   if(run){
-    vert_invert_Model <- metafor::rma.mv(InRR_Transformed ~ vert_invert-1, V = VCV, test = "t", dfs = "contain",
+    vert_invert_Model <- metafor::rma.mv(PRRD ~ vert_invert-1, V = VCV, test = "t", dfs = "contain",
                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                    R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
@@ -696,7 +617,7 @@ vert_invert_Model_rob_Model_i2 <- data.frame(round(orchaRd::i2_ml(vert_invert_Mo
 run <- TRUE
 system.time(
   if(run){
-    habitat_Model <- metafor::rma.mv(InRR_Transformed ~ Ecosystem-1, V = VCV, test = "t", dfs = "contain",
+    habitat_Model <- metafor::rma.mv(PRRD ~ Ecosystem-1, V = VCV, test = "t", dfs = "contain",
                                    random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                  ~1|Shared_Animal_Number, ~1|Measurement), 
                                    R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
@@ -751,64 +672,18 @@ density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID
                                            paste(format(round(mean(exp(vert_invert_Model_Estimates[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
                  x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
 
- size = 24
+  size = 24
   position = "topleft"
   fig4 <- (density_habitat_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_vert_invert_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
 
   ggsave(filename = "./output/figs/fig4.png", fig4, width = 11.9125, height =  8.049383)
-
-##### Individual-Level Trait Subset Model #####
-Individual_Subset_Data <- data %>% filter(Trait_Category != "Population")
-Individual_Species <- Individual_Subset_Data %>% select("phylo") %>% unique()
-
-Individual_A_cor <- as.data.frame(A_cor)
-Individual_A_cor <- Individual_A_cor[c(Individual_Species$phylo), c(Individual_Species$phylo)]
-Individual_A_cor <- as.matrix(Individual_A_cor)
-
-Individual_VCV <- make_VCV_matrix(Individual_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
-
-run <- TRUE
-system.time(
-  if(run){
-    Individual_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Individual_VCV, test = "t", dfs = "contain",
-                                        random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
-                                                      ~1|Shared_Animal_Number, ~1|Measurement), 
-                                        R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE,
-                                        control=list(rel.tol=1e-9))
-    saveRDS(Individual_Model, "./output/models/Complex_Individual_Model.rds")
-  } else {
-    Individual_Model <- readRDS("./output/models/Complex_Individual_Model.rds")
-    })
-
-Individual_Model_rob <- robust(Individual_Model, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
-
-Individual_Model_Estimates <- data.frame(estimate = Individual_Model$b, ci.lb = Individual_Model$ci.lb, ci.ub = Individual_Model$ci.ub)
-Individual_Model_i2 <- data.frame(round(orchaRd::i2_ml(Individual_Model), 2))
-
-##### Figure 2 #####
-density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
-                      annotate('text',  x =1+0.1, y = 0.18,
-                       label= paste("italic(k)==", dim(data)[1], "~","(", length(unique(data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label= paste(format(round(mean(exp(Overall_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                 x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "Overall")) 
-
-
-indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
-                      annotate('text',  x =1+0.1, y = 0.18,
-                       label= paste("italic(k)==", dim(Individual_Subset_Data)[1], "~","(", length(unique(Individual_Subset_Data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
-                  annotate('text', label= paste(format(round(mean(exp(Individual_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                 x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "")) 
-
-fig2 <- (density_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))  | indivdual_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
-
-ggsave(filename = "./output/figs/fig2.png", , width = 11.2, height =  5.8)
 
 
 #### Individual-Level Subset Model - Fluctuation Amplitude Meta-Regression ####
 run <- TRUE
 system.time(
   if(run){
-    Individual_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_VCV, test = "t", dfs = "contain",
+    Individual_Amplitude_Model <- metafor::rma.mv(PRRD, V = Individual_VCV, test = "t", dfs = "contain",
                                                   mods = ~ Fluctuation_Magnitude,
                                                   random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                 ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -876,12 +751,12 @@ Individual_Fluctuation_A_cor <- as.data.frame(A_cor)
 Individual_Fluctuation_A_cor <- Individual_Fluctuation_A_cor[c(Individual_Fluctuation_Species$phylo), c(Individual_Fluctuation_Species$phylo)]
 Individual_Fluctuation_A_cor <- as.matrix(Individual_Fluctuation_A_cor)
 
-Individual_Fluctuation_VCV <- make_VCV_matrix(Individual_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Individual_Fluctuation_VCV <- make_VCV_matrix(Individual_Fluctuation_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Individual_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_Fluctuation_VCV, test = "t", dfs = "contain",
+    Individual_Fluctuation_Model <- metafor::rma.mv(PRRD, V = Individual_Fluctuation_VCV, test = "t", dfs = "contain",
                                                     mods = ~ Fluctuation_Category - 1,
                                                     random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                   ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -943,172 +818,6 @@ individual_fluctuation_raw_name <- c(replicate(74, "Sinusoidal (Sine Curve)"),
 individual_fluctuation_raw_df <- data.frame("Model" = individual_fluctuation_raw_name, 
                                             "Effect" = individual_fluctuation_raw_mean)
 
-# Graph code - Combined
-
-Individual_Fluctuation_Order <- c("Stepwise", "Alternating", "Sinusoidal (Sine Curve)")
-
-density_individual_fluctuation <- individual_fluctuation_table %>% mutate(name = fct_relevel(name, Individual_Fluctuation_Order)) %>%
-                                  ggplot() +
-                                  geom_density_ridges(data = individual_fluctuation_raw_df %>% mutate(Model = fct_relevel(Model, Individual_Fluctuation_Order)), 
-                                                      aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                          scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                                  geom_linerange(aes(y = rev(seq(1, dim(individual_fluctuation_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                                     size = 1) +
-                                  geom_linerange(aes(y = rev(seq(1, dim(individual_fluctuation_table)[1], 1)), xmin = min(individual_fluctuation_raw_df$Effect)-0.01, xmax = -1.5, colour = name),
-                                                 size = 1) +
-                                  geom_linerange(aes(y = rev(seq(1, dim(individual_fluctuation_table)[1], 1)), xmin = max(individual_fluctuation_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                                 size = 1) +
-                                  geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(individual_fluctuation_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                                      size = 1, fatten = 2) +
-                                  theme_bw() +
-                                  guides(fill = "none", colour = "none") +
-                                  labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                                  theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                        vjust = c(-2.7, -2.7, -0.8))) +
-                                  theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                                  theme(axis.ticks = element_blank()) +
-                                  theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                                  theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                                  scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                                  scale_colour_manual(values = c("#5D7AA1", "#4A6E9C", "#2B4E7A")) +
-                                  scale_fill_manual(values = c("#5D7AA1", "#4A6E9C", "#2B4E7A")) +
-                                  coord_cartesian(xlim = c(-0.5, 0.5)) +
-                                  annotate('text',  x = 0.5, y = (seq(1, dim(individual_fluctuation_table)[1], 1)+0.4),
-                                  label= paste("italic(k)==", c(individual_fluctuation_table["Stepwise", "K"], 
-                                                                individual_fluctuation_table["Alternating", "K"], 
-                                                                individual_fluctuation_table["Sinusoidal (Sine Curve)", "K"]), "~","(", 
-                                                              c(individual_fluctuation_table["Stepwise", "group_no"], 
-                                                                individual_fluctuation_table["Alternating", "group_no"], 
-                                                                individual_fluctuation_table["Sinusoidal (Sine Curve)", "group_no"]), 
-                                               ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                                  geom_label(aes(label=c(paste(format(round(mean(exp(Individual_Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                                         paste(format(round(mean(exp(Individual_Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                                         paste(format(round(mean(exp(Individual_Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                                 x = -0.4, y = (seq(1, dim(individual_fluctuation_table)[1], 1)+0.4)), size = 3.5)
-
-density_individual_fluctuation
-
-##### Individual-Level Subset Model - Class Meta-Regression #####
-Individual_Class_Exploration <- Individual_Subset_Data %>% select("Class") %>% table() %>% data.frame()
-rownames(Individual_Class_Exploration) <- Individual_Class_Exploration$Class
-
-Individual_Class_Data <- Individual_Subset_Data %>% filter(Class == "Arachnida"|
-                                                           Class == "Insecta")
-
-Individual_Class_Species_Count <- Individual_Class_Data %>% select("Scientific_Name", "Class") %>% table() %>% data.frame() %>%
-                                  filter(`Freq` != 0) %>% select("Class") %>% table() %>% data.frame()
-rownames(Individual_Class_Species_Count) <- Individual_Class_Species_Count$Class
-
-Individual_Class_Study_Count <- Individual_Class_Data %>% select("Study_ID", "Class") %>% table() %>% data.frame() %>%
-                                filter(`Freq` != 0) %>% select("Class") %>% table() %>% data.frame()
-rownames(Individual_Class_Study_Count) <- Individual_Class_Study_Count$Class
-
-Individual_Class_Species <- Individual_Class_Data %>% select("phylo") %>% unique()
-
-Individual_Class_A_cor <- as.data.frame(A_cor)
-Individual_Class_A_cor <- Individual_Class_A_cor[c(Individual_Class_Species$phylo), c(Individual_Class_Species$phylo)]
-Individual_Class_A_cor <- as.matrix(Individual_Class_A_cor)
-
-Individual_Class_VCV <- make_VCV_matrix(Individual_Class_Data, V = "v_InRR", cluster = "Shared_Control_Number")
-
-run <- TRUE
-system.time(
-  if(run){
-    Individual_Class_Model <- metafor::rma.mv(InRR_Transformed, V = Individual_Class_VCV, test = "t", dfs = "contain",
-                                              mods = ~ Class - 1,
-                                              random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
-                                                            ~1|Shared_Animal_Number, ~1|Measurement), 
-                                              R = list(phylo=Individual_Class_A_cor), data = Individual_Class_Data, method = "REML", sparse = TRUE, 
-                                              control=list(rel.tol=1e-9))
-    saveRDS(Individual_Class_Model, "./output/models/Complex_Individual_Class_Model.rds")
-  } else {
-    Individual_Class_Model <- readRDS("./output/models/Complex_Individual_Class_Model.rds")})
-
-Individual_Class_Model_rob <- robust(Individual_Class_Model, cluster = Individual_Class_Data$Study_ID, adjust = TRUE)
-
-Individual_Class_Model_Estimates <- data.frame(Class = substr(row.names(Individual_Class_Model$b), 6, 100),
-                                               estimate = Individual_Class_Model$b, ci.lb = Individual_Class_Model$ci.lb, 
-                                               ci.ub = Individual_Class_Model$ci.ub)
-rownames(Individual_Class_Model_Estimates) <- Individual_Class_Model_Estimates$Class
-Individual_Class_Model_i2 <- data.frame(round(orchaRd::i2_ml(Individual_Class_Model), 2))
-
-# Preparing Graph - Combined
-
-individual_class_rnames <- c("Arachnida", "Insecta")
-
-individual_class_k <- data.frame("k" = c(Individual_Class_Exploration["Arachnida", "Freq"], 
-                                         Individual_Class_Exploration["Insecta", "Freq"]), 
-                                 row.names = individual_class_rnames)
-
-individual_class_group_no <- data.frame("Spp No." = c(Individual_Class_Species_Count["Arachnida", "Freq"],
-                                                      Individual_Class_Species_Count["Insecta", "Freq"]), 
-                                        row.names = individual_class_rnames)
-
-individual_class_study <- data.frame("Study" = c(Individual_Class_Study_Count["Arachnida", "Freq"],
-                                                 Individual_Class_Study_Count["Insecta", "Freq"]), 
-                                     row.names = individual_class_rnames)
-
-individual_class_table <- data.frame(estimate = Individual_Class_Model_Estimates[,"estimate"], 
-                                     lowerCL = Individual_Class_Model_Estimates[,"ci.lb"], 
-                                     upperCL = Individual_Class_Model_Estimates[,"ci.ub"], 
-                                     K = individual_class_k[,1], 
-                                     group_no = individual_class_group_no[,1], 
-                                     row.names = individual_class_rnames)
-individual_class_table$name <- row.names(individual_class_table)
-
-individual_class_raw_mean <- c(unlist(unname(Individual_Class_Data %>% filter(`Class` == "Arachnida") %>% 
-                                               select("InRR_Transformed"))), 
-                               unlist(unname(Individual_Class_Data %>% filter(`Class` == "Insecta") %>% 
-                                               select("InRR_Transformed"))))
-
-individual_class_raw_name <- c(replicate(11, "Arachnida"), 
-                               replicate(104, "Insecta"))
-
-individual_class_raw_df <- data.frame("Model" = individual_class_raw_name, 
-                                      "Effect" = individual_class_raw_mean)
-
-# Graph code - Combined
-
-Individual_Class_Order <- c("Insecta", "Arachnida")
-
-density_individual_class <- individual_class_table %>% mutate(name = fct_relevel(name, Individual_Class_Order)) %>%
-                            ggplot() +
-                            geom_density_ridges(data = individual_class_raw_df %>% mutate(Model = fct_relevel(Model, Individual_Class_Order)), 
-                                                aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                    scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                            geom_linerange(aes(y = rev(seq(1, dim(individual_class_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                               size = 1) +
-                            geom_linerange(aes(y = rev(seq(1, dim(individual_class_table)[1], 1)), xmin = min(individual_class_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
-                                           size = 1) +
-                            geom_linerange(aes(y = rev(seq(1, dim(individual_class_table)[1], 1)), xmin = max(individual_class_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                           size = 1) +
-                            geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(individual_class_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                                size = 1, fatten = 2) +
-                            theme_bw() +
-                            guides(fill = "none", colour = "none") +
-                            labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                            theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                  vjust = c(-2.7, -2.7))) +
-                            theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                            theme(axis.ticks = element_blank()) +
-                            theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                            theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                            scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                            scale_colour_manual(values = c("#5D7AA1", "#2B4E7A")) +
-                            scale_fill_manual(values = c("#5D7AA1", "#2B4E7A")) +
-                            coord_cartesian(xlim = c(-0.5, 0.5)) +
-                            annotate('text',  x = 0.5, y = (seq(1, dim(individual_class_table)[1], 1)+0.4),
-                            label= paste("italic(k)==", c(individual_class_table["Insecta", "K"], 
-                                                          individual_class_table["Arachnida", "K"]), "~","(", 
-                                                        c(individual_class_table["Insecta", "group_no"], 
-                                                          individual_class_table["Arachnida", "group_no"]), 
-                                         ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                            geom_label(aes(label=c(paste(format(round(mean(exp(Individual_Class_Model_Estimates["Insecta", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                                   paste(format(round(mean(exp(Individual_Class_Model_Estimates["Arachnida", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                           x = -0.4, y = (seq(1, dim(individual_class_table)[1], 1)+0.4)), size = 3.5)
-
-density_individual_class
-
 ##### Aquatic Subset Model #####
 Aquatic_Subset_Data <- Individual_Subset_Data %>% filter(Ecosystem == "Aquatic")
 Aquatic_Species <- Aquatic_Subset_Data %>% select("phylo") %>% unique()
@@ -1117,12 +826,12 @@ Aquatic_A_cor <- as.data.frame(A_cor)
 Aquatic_A_cor <- Aquatic_A_cor[c(Aquatic_Species$phylo), c(Aquatic_Species$phylo)]
 Aquatic_A_cor <- as.matrix(Aquatic_A_cor)
 
-Aquatic_VCV <- make_VCV_matrix(Aquatic_Subset_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Aquatic_VCV <- make_VCV_matrix(Aquatic_Subset_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Aquatic_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = Aquatic_VCV, test = "t", dfs = "contain",
+    Aquatic_Model <- metafor::rma.mv(PRRD ~ 1, V = Aquatic_VCV, test = "t", dfs = "contain",
                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=Aquatic_A_cor), data = Aquatic_Subset_Data, method = "REML", sparse = TRUE, 
@@ -1140,7 +849,7 @@ Aquatic_Model_i2 <- data.frame(round(orchaRd::i2_ml(Aquatic_Model), 2))
 run <- TRUE
 system.time(
   if(run){
-    Aquatic_Amplitude_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_VCV, test = "t", dfs = "contain",
+    Aquatic_Amplitude_Model <- metafor::rma.mv(PRRD, V = Aquatic_VCV, test = "t", dfs = "contain",
                                                mods = ~ Fluctuation_Magnitude,
                                                random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                              ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1207,12 +916,12 @@ Aquatic_Fluctuation_A_cor <- as.data.frame(A_cor)
 Aquatic_Fluctuation_A_cor <- Aquatic_Fluctuation_A_cor[c(Aquatic_Fluctuation_Species$phylo), c(Aquatic_Fluctuation_Species$phylo)]
 Aquatic_Fluctuation_A_cor <- as.matrix(Aquatic_Fluctuation_A_cor)
 
-Aquatic_Fluctuation_VCV <- make_VCV_matrix(Aquatic_Fluctuation_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Aquatic_Fluctuation_VCV <- make_VCV_matrix(Aquatic_Fluctuation_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Aquatic_Fluctuation_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_Fluctuation_VCV, test = "t", dfs = "contain",
+    Aquatic_Fluctuation_Model <- metafor::rma.mv(PRRD, V = Aquatic_Fluctuation_VCV, test = "t", dfs = "contain",
                                                  mods = ~ Fluctuation_Category - 1,
                                                  random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                                ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1268,48 +977,6 @@ aquatic_fluctuation_raw_name <- c(replicate(39, "Sinusoidal (Sine Curve)"),
 aquatic_fluctuation_raw_df <- data.frame("Model" = aquatic_fluctuation_raw_name, 
                                          "Effect" = aquatic_fluctuation_raw_mean)
 
-# Graph code - Combined
-
-Aquatic_Fluctuation_Order <- c("Alternating", "Sinusoidal (Sine Curve)")
-
-density_aquatic_fluctuation <- aquatic_fluctuation_table %>% mutate(name = fct_relevel(name, Aquatic_Fluctuation_Order)) %>%
-                               ggplot() +
-                               geom_density_ridges(data = aquatic_fluctuation_raw_df %>% mutate(Model = fct_relevel(Model, Aquatic_Fluctuation_Order)), 
-                                                   aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                       scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                               geom_linerange(aes(y = rev(seq(1, dim(aquatic_fluctuation_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                                  size = 1) +
-                               geom_linerange(aes(y = rev(seq(1, dim(aquatic_fluctuation_table)[1], 1)), xmin = min(aquatic_fluctuation_raw_df$Effect)-0.02, xmax = -1.5, colour = name),
-                                              size = 1) +
-                               geom_linerange(aes(y = rev(seq(1, dim(aquatic_fluctuation_table)[1], 1)), xmin = max(aquatic_fluctuation_raw_df$Effect)+0.02, xmax = 1.5, colour = name),
-                                              size = 1) +
-                               geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(aquatic_fluctuation_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                                   size = 1, fatten = 2) +
-                               theme_bw() +
-                               guides(fill = "none", colour = "none") +
-                               labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                               theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                                     vjust = c(-2.7, -0.8))) +
-                               theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                               theme(axis.ticks = element_blank()) +
-                               theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                               theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                               scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                               scale_colour_manual(values = c("#5D7AA1", "#2B4E7A")) +
-                               scale_fill_manual(values = c("#5D7AA1", "#2B4E7A")) +
-                               coord_cartesian(xlim = c(-0.5, 0.5)) +
-                               annotate('text',  x = 0.5, y = (seq(1, dim(aquatic_fluctuation_table)[1], 1)+0.4),
-                               label= paste("italic(k)==", c(aquatic_fluctuation_table["Alternating", "K"], 
-                                                             aquatic_fluctuation_table["Sinusoidal (Sine Curve)", "K"]), "~","(", 
-                                                           c(aquatic_fluctuation_table["Alternating", "group_no"], 
-                                                             aquatic_fluctuation_table["Sinusoidal (Sine Curve)", "group_no"]), 
-                                            ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                               geom_label(aes(label=c(paste(format(round(mean(exp(Aquatic_Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                                                      paste(format(round(mean(exp(Aquatic_Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                              x = -0.4, y = (seq(1, dim(aquatic_fluctuation_table)[1], 1)+0.4)), size = 3.5)
-
-density_aquatic_fluctuation
-
 ##### Aquatic Subset Model - Trait Meta-Regression #####
 Aquatic_Trait_Exploration <- Aquatic_Subset_Data %>% select("Trait_Category") %>% table() %>% data.frame()
 rownames(Aquatic_Trait_Exploration) <- Aquatic_Trait_Exploration$Trait_Category
@@ -1332,12 +999,12 @@ Aquatic_Trait_A_cor <- as.data.frame(A_cor)
 Aquatic_Trait_A_cor <- Aquatic_Trait_A_cor[c(Aquatic_Trait_Species$phylo), c(Aquatic_Trait_Species$phylo)]
 Aquatic_Trait_A_cor <- as.matrix(Aquatic_Trait_A_cor)
 
-Aquatic_Trait_VCV <- make_VCV_matrix(Aquatic_Trait_Data, V = "v_InRR", cluster = "Shared_Control_Number")
+Aquatic_Trait_VCV <- make_VCV_matrix(Aquatic_Trait_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
 
 run <- TRUE
 system.time(
   if(run){
-    Aquatic_Trait_Model <- metafor::rma.mv(InRR_Transformed, V = Aquatic_Trait_VCV, test = "t", dfs = "contain",
+    Aquatic_Trait_Model <- metafor::rma.mv(PRRD, V = Aquatic_Trait_VCV, test = "t", dfs = "contain",
                                            mods = ~ Trait_Category - 1,
                                            random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                          ~1|Shared_Animal_Number, ~1|Measurement), 
@@ -1390,47 +1057,6 @@ aquatic_trait_raw_name <- c(replicate(15, "Life-history Traits"),
 aquatic_trait_raw_df <- data.frame("Model" = aquatic_trait_raw_name, 
                                    "Effect" = aquatic_trait_raw_mean)
 
-# Graph code - Combined
-
-Aquatic_Trait_Order <- c("Physiological", "Life-history Traits")
-
-density_aquatic_trait <- aquatic_trait_table %>% mutate(name = fct_relevel(name, Aquatic_Trait_Order)) %>%
-                         ggplot() +
-                         geom_density_ridges(data = aquatic_trait_raw_df %>% mutate(Model = fct_relevel(Model, Aquatic_Trait_Order)), 
-                                             aes(x = Effect, y = Model, colour = Model, fill = Model), 
-                                                 scale = 0.8, alpha = 0.3, size = 1, inherit.aes = FALSE) +
-                         geom_linerange(aes(y = rev(seq(1, dim(aquatic_trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, colour = name),
-                                            size = 1) +
-                         geom_linerange(aes(y = rev(seq(1, dim(aquatic_trait_table)[1], 1)), xmin = min(aquatic_trait_raw_df$Effect)-0.04, xmax = -1.5, colour = name),
-                                        size = 1) +
-                         geom_linerange(aes(y = rev(seq(1, dim(aquatic_trait_table)[1], 1)), xmin = max(aquatic_trait_raw_df$Effect)+0.04, xmax = 1.5, colour = name),
-                                        size = 1) +
-                         geom_pointrange(aes(x = estimate, y = rev(seq(1, dim(aquatic_trait_table)[1], 1)-0.1), xmin = lowerCL, xmax = upperCL, fill = name, colour = name), 
-                                             size = 1, fatten = 2) +
-                         theme_bw() +
-                         guides(fill = "none", colour = "none") +
-                         labs(x = expression("Effect Size (PRRD"["S"]*")"), y = "") +
-                         theme(axis.text.y = element_text(size = 10, colour ="black", hjust = 0.5, 
-                               vjust = c(-2.7, -0.8))) +
-                         theme(axis.text.x = element_text(margin = margin(b = 5))) +
-                         theme(axis.ticks = element_blank()) +
-                         theme(panel.grid.major.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                         theme(panel.grid.minor.x = element_line(colour = rgb(235, 235, 235, 150, maxColorValue = 500))) +
-                         scale_y_discrete(expand = expansion(add = c(0.2, 1)), labels = function(x) str_wrap(x, width = 13)) +
-                         scale_colour_manual(values = c("#5D7AA1", "#2B4E7A")) +
-                         scale_fill_manual(values = c("#5D7AA1", "#2B4E7A")) +
-                         coord_cartesian(xlim = c(-0.5, 0.5)) +
-                         annotate('text',  x = 0.5, y = (seq(1, dim(aquatic_trait_table)[1], 1)+0.4),
-                         label= paste("italic(k)==", c(aquatic_trait_table["Physiological", "K"], 
-                                                       aquatic_trait_table["Life-history Traits", "K"]), "~","(", 
-                                                     c(aquatic_trait_table["Physiological", "group_no"], 
-                                                       aquatic_trait_table["Life-history Traits", "group_no"]), 
-                                      ")"), parse = TRUE, hjust = "right", size = 3.5) +
-                         geom_label(aes(label=c(paste(format(round(mean(exp(Aquatic_Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                                                paste(format(round(mean(exp(Aquatic_Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                                        x = -0.4, y = (seq(1, dim(aquatic_trait_table)[1], 1)+0.4)), size = 3.5)
-
-density_aquatic_trait
 
 ##### Aquatic Subset Model - Plasticity Mechanism Meta-Regression #####
 Aquatic_Plasticity_Exploration <- Aquatic_Subset_Data %>% select("Plasticity_Mechanism") %>% table() %>% data.frame()
