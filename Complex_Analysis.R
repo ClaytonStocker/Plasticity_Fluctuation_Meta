@@ -61,6 +61,10 @@ system.time(
   })
 
 Overall_Model_rob <- robust(Overall_Model, cluster = data$Study_ID, adjust = TRUE)
+predict(Overall_Model_rob, transf=transf.exp.int)
+
+# Funnel plot
+funnel(x=residuals(Overall_Model_rob), vi = data$v_PRRD, yaxis="seinv", ylab = "Inverse Standard Error (1/SE)", xlab = "Meta-analytic Residuals")
 
 Overall_Model_Estimates <- data.frame(estimate = Overall_Model$b, 
                                          ci.lb = Overall_Model$ci.lb, 
@@ -3958,94 +3962,4 @@ Heterogeneity_Overall <- data.frame("Models" = c("Overall", "Fluctuation Amplitu
                                     "Total" = c(Overall_Model_i2[1, 1], Amplitude_Model_i2[1, 1], Fluctuation_Model_i2[1, 1], 
                                                 Trait_Model_i2[1, 1], Specific_Trait_Model_i2[1, 1], Class_Model_i2[1, 1]))
 
-Heterogeneity_Individual <- data.frame("Models" = c("Individual-level Traits", "Fluctuation Amplitude", 
-                                                    "Fluctuation Type", "Taxonomic Class"), 
-                                       "Shared Animal" = c(Individual_Model_i2[6, 1], Individual_Amplitude_Model_i2[6, 1], 
-                                                           Individual_Fluctuation_Model_i2[6, 1], Individual_Class_Model_i2[6, 1]),
-                                       "Measurement" = c(Individual_Model_i2[7, 1], Individual_Amplitude_Model_i2[7, 1], 
-                                                         Individual_Fluctuation_Model_i2[7, 1], Individual_Class_Model_i2[7, 1]),
-                                       "Observational" = c(Individual_Model_i2[4, 1], Individual_Amplitude_Model_i2[4, 1], 
-                                                           Individual_Fluctuation_Model_i2[4, 1], Individual_Class_Model_i2[4, 1]), 
-                                       "Phylogenetic Relatedness" = c(Individual_Model_i2[2, 1], Individual_Amplitude_Model_i2[2, 1], 
-                                                                      Individual_Fluctuation_Model_i2[2, 1], Individual_Class_Model_i2[2, 1]), 
-                                       "Species" = c(Individual_Model_i2[5, 1], Individual_Amplitude_Model_i2[5, 1], 
-                                                     Individual_Fluctuation_Model_i2[5, 1], Individual_Class_Model_i2[5, 1]),
-                                       "Study" = c(Individual_Model_i2[3, 1], Individual_Amplitude_Model_i2[3, 1], 
-                                                   Individual_Fluctuation_Model_i2[3, 1], Individual_Class_Model_i2[3, 1]), 
-                                       "Total" = c(Individual_Model_i2[1, 1], Individual_Amplitude_Model_i2[1, 1], 
-                                                   Individual_Fluctuation_Model_i2[1, 1], Individual_Class_Model_i2[1, 1]))
-
-Heterogeneity_Aquatic <- data.frame("Models" = c("Aquatic Organisms", "Exposure Type", "Fluctuation Amplitude", 
-                                                 "Fluctuation Type", "Phenotypic Trait Categories"), 
-                                    "Shared Animal" = c(Aquatic_Model_i2[6, 1], Aquatic_Plasticity_Model_i2[6, 1], Aquatic_Amplitude_Model_i2[6, 1], 
-                                                        Aquatic_Fluctuation_Model_i2[6, 1], Aquatic_Trait_Model_i2[6, 1]),
-                                    "Measurement" = c(Aquatic_Model_i2[7, 1], Aquatic_Plasticity_Model_i2[7, 1], Aquatic_Amplitude_Model_i2[7, 1], 
-                                                      Aquatic_Fluctuation_Model_i2[7, 1], Aquatic_Trait_Model_i2[7, 1]),
-                                    "Observational" = c(Aquatic_Model_i2[4, 1], Aquatic_Plasticity_Model_i2[4, 1], Aquatic_Amplitude_Model_i2[4, 1], 
-                                                        Aquatic_Fluctuation_Model_i2[4, 1], Aquatic_Trait_Model_i2[4, 1]), 
-                                    "Phylogenetic Relatedness" = c(Aquatic_Model_i2[2, 1], Aquatic_Plasticity_Model_i2[2, 1], Aquatic_Amplitude_Model_i2[2, 1], 
-                                                                   Aquatic_Fluctuation_Model_i2[2, 1], Aquatic_Trait_Model_i2[2, 1]), 
-                                    "Species" = c(Aquatic_Model_i2[5, 1], Aquatic_Plasticity_Model_i2[5, 1], Aquatic_Amplitude_Model_i2[5, 1], 
-                                                  Aquatic_Fluctuation_Model_i2[5, 1], Aquatic_Trait_Model_i2[5, 1]),
-                                    "Study" = c(Aquatic_Model_i2[3, 1], Aquatic_Plasticity_Model_i2[3, 1], Aquatic_Amplitude_Model_i2[3, 1], 
-                                                Aquatic_Fluctuation_Model_i2[3, 1], Aquatic_Trait_Model_i2[3, 1]), 
-                                    "Total" = c(Aquatic_Model_i2[1, 1], Aquatic_Plasticity_Model_i2[1, 1], Aquatic_Amplitude_Model_i2[1, 1], 
-                                                Aquatic_Fluctuation_Model_i2[1, 1], Aquatic_Trait_Model_i2[1, 1]))
-
-Heterogeneity_Terrestrial <- data.frame("Models" = c("Terrestrial Organisms", "Exposure Type", "Fluctuation Amplitude", 
-                                                     "Fluctuation Type", "Phenotypic Trait Categories", "Specific Phenotypic Traits"), 
-                                        "Shared Animal" = c(Terrestrial_Model_i2[6, 1], Terrestrial_Plasticity_Model_i2[6, 1], Terrestrial_Amplitude_Model_i2[6, 1], 
-                                                            Terrestrial_Fluctuation_Model_i2[6, 1], Terrestrial_Trait_Model_i2[6, 1], Terrestrial_Specific_Trait_Model_i2[6, 1]),
-                                        "Measurement" = c(Terrestrial_Model_i2[7, 1], Terrestrial_Plasticity_Model_i2[7, 1], Terrestrial_Amplitude_Model_i2[7, 1], 
-                                                          Terrestrial_Fluctuation_Model_i2[7, 1], Terrestrial_Trait_Model_i2[7, 1], NA),
-                                        "Observational" = c(Terrestrial_Model_i2[4, 1], Terrestrial_Plasticity_Model_i2[4, 1], Terrestrial_Amplitude_Model_i2[4, 1], 
-                                                            Terrestrial_Fluctuation_Model_i2[4, 1], Terrestrial_Trait_Model_i2[4, 1], Terrestrial_Specific_Trait_Model_i2[4, 1]), 
-                                        "Phylogenetic Relatedness" = c(Terrestrial_Model_i2[2, 1], Terrestrial_Plasticity_Model_i2[2, 1], Terrestrial_Amplitude_Model_i2[2, 1], 
-                                                                       Terrestrial_Fluctuation_Model_i2[2, 1], Terrestrial_Trait_Model_i2[2, 1], Terrestrial_Specific_Trait_Model_i2[2, 1]), 
-                                        "Species" = c(Terrestrial_Model_i2[5, 1], Terrestrial_Plasticity_Model_i2[5, 1], Terrestrial_Amplitude_Model_i2[5, 1], 
-                                                      Terrestrial_Fluctuation_Model_i2[5, 1], Terrestrial_Trait_Model_i2[5, 1], Terrestrial_Specific_Trait_Model_i2[5, 1]),
-                                        "Study" = c(Terrestrial_Model_i2[3, 1], Terrestrial_Plasticity_Model_i2[3, 1], Terrestrial_Amplitude_Model_i2[3, 1], 
-                                                    Terrestrial_Fluctuation_Model_i2[3, 1], Terrestrial_Trait_Model_i2[3, 1], Terrestrial_Specific_Trait_Model_i2[3, 1]), 
-                                        "Total" = c(Terrestrial_Model_i2[1, 1], Terrestrial_Plasticity_Model_i2[1, 1], Terrestrial_Amplitude_Model_i2[1, 1], 
-                                                    Terrestrial_Fluctuation_Model_i2[1, 1], Terrestrial_Trait_Model_i2[1, 1], Terrestrial_Specific_Trait_Model_i2[1, 1]))
-
-Heterogeneity_Acclimation <- data.frame("Models" = c("Acclimation", "Exposure Time", "Fluctuation Amplitude", "Fluctuation Type", "Life-history Stage", 
-                                                     "Number of Fluctuations", "Phenotypic Trait Categories", "Specific Phenotypic Traits", "Taxonomic Class"), 
-                                        "Shared Animal" = c(Acclimation_Model_i2[6, 1], Acclimation_Exposure_Model_i2[6, 1], Acclimation_Amplitude_Model_i2[6, 1], Acclimation_Fluctuation_Model_i2[6, 1], Acclimation_Stage_Model_i2[6, 1], 
-                                                            Acclimation_Frequency_Model_i2[6, 1], Acclimation_Trait_Model_i2[6, 1], Acclimation_Specific_Trait_Model_i2[6, 1], Acclimation_Class_Model_i2[6, 1]),
-                                        "Measurement" = c(Acclimation_Model_i2[7, 1], Acclimation_Exposure_Model_i2[7, 1], Acclimation_Amplitude_Model_i2[7, 1], Acclimation_Fluctuation_Model_i2[7, 1], Acclimation_Stage_Model_i2[7, 1], 
-                                                          Acclimation_Frequency_Model_i2[7, 1], Acclimation_Trait_Model_i2[7, 1], NA, Acclimation_Class_Model_i2[7, 1]),
-                                        "Observational" = c(Acclimation_Model_i2[4, 1], Acclimation_Exposure_Model_i2[4, 1], Acclimation_Amplitude_Model_i2[4, 1], Acclimation_Fluctuation_Model_i2[4, 1], Acclimation_Stage_Model_i2[4, 1], 
-                                                            Acclimation_Frequency_Model_i2[4, 1], Acclimation_Trait_Model_i2[4, 1], Acclimation_Specific_Trait_Model_i2[4, 1], Acclimation_Class_Model_i2[4, 1]), 
-                                        "Phylogenetic Relatedness" = c(Acclimation_Model_i2[2, 1], Acclimation_Exposure_Model_i2[2, 1], Acclimation_Amplitude_Model_i2[2, 1], Acclimation_Fluctuation_Model_i2[2, 1], Acclimation_Stage_Model_i2[2, 1], 
-                                                                       Acclimation_Frequency_Model_i2[2, 1], Acclimation_Trait_Model_i2[2, 1], Acclimation_Specific_Trait_Model_i2[2, 1], Acclimation_Class_Model_i2[2, 1]), 
-                                        "Species" = c(Acclimation_Model_i2[5, 1], Acclimation_Exposure_Model_i2[5, 1], Acclimation_Amplitude_Model_i2[5, 1], Acclimation_Fluctuation_Model_i2[5, 1], Acclimation_Stage_Model_i2[5, 1], 
-                                                      Acclimation_Frequency_Model_i2[5, 1], Acclimation_Trait_Model_i2[5, 1], Acclimation_Specific_Trait_Model_i2[5, 1], Acclimation_Class_Model_i2[5, 1]),
-                                        "Study" = c(Acclimation_Model_i2[3, 1], Acclimation_Exposure_Model_i2[3, 1], Acclimation_Amplitude_Model_i2[3, 1], Acclimation_Fluctuation_Model_i2[3, 1], Acclimation_Stage_Model_i2[3, 1], 
-                                                    Acclimation_Frequency_Model_i2[3, 1], Acclimation_Trait_Model_i2[3, 1], Acclimation_Specific_Trait_Model_i2[3, 1], Acclimation_Class_Model_i2[3, 1]), 
-                                        "Total" = c(Acclimation_Model_i2[1, 1], Acclimation_Exposure_Model_i2[1, 1], Acclimation_Amplitude_Model_i2[1, 1], Acclimation_Fluctuation_Model_i2[1, 1], Acclimation_Stage_Model_i2[1, 1], 
-                                                    Acclimation_Frequency_Model_i2[1, 1], Acclimation_Trait_Model_i2[1, 1], Acclimation_Specific_Trait_Model_i2[1, 1], Acclimation_Class_Model_i2[1, 1]))
-
-Heterogeneity_Developmental <- data.frame("Models" = c("Developmental", "Exposure Time", "Fluctuation Amplitude", "Fluctuation Type", 
-                                                       "Phenotypic Trait Categories", "Specific Phenotypic Traits", "Taxonomic Class"), 
-                                          "Shared Animal" = c(Developmental_Model_i2[6, 1], Developmental_Exposure_Model_i2[6, 1], Developmental_Amplitude_Model_i2[6, 1], Developmental_Fluctuation_Model_i2[6, 1], 
-                                                              Developmental_Trait_Model_i2[6, 1], Developmental_Specific_Trait_Model_i2[6, 1], Developmental_Class_Model_i2[6, 1]),
-                                          "Measurement" = c(Developmental_Model_i2[7, 1], Developmental_Exposure_Model_i2[7, 1], Developmental_Amplitude_Model_i2[7, 1], Developmental_Fluctuation_Model_i2[7, 1], 
-                                                            Developmental_Trait_Model_i2[7, 1], NA, Developmental_Class_Model_i2[7, 1]),
-                                          "Observational" = c(Developmental_Model_i2[4, 1], Developmental_Exposure_Model_i2[4, 1], Developmental_Amplitude_Model_i2[4, 1], Developmental_Fluctuation_Model_i2[4, 1], 
-                                                              Developmental_Trait_Model_i2[4, 1], Developmental_Specific_Trait_Model_i2[4, 1], Developmental_Class_Model_i2[4, 1]), 
-                                          "Phylogenetic Relatedness" = c(Developmental_Model_i2[2, 1], Developmental_Exposure_Model_i2[2, 1], Developmental_Amplitude_Model_i2[2, 1], Developmental_Fluctuation_Model_i2[2, 1], 
-                                                                         Developmental_Trait_Model_i2[2, 1], Developmental_Specific_Trait_Model_i2[2, 1], Developmental_Class_Model_i2[2, 1]), 
-                                          "Species" = c(Developmental_Model_i2[5, 1], Developmental_Exposure_Model_i2[5, 1], Developmental_Amplitude_Model_i2[5, 1], Developmental_Fluctuation_Model_i2[5, 1], 
-                                                        Developmental_Trait_Model_i2[5, 1], Developmental_Specific_Trait_Model_i2[5, 1], Developmental_Class_Model_i2[5, 1]),
-                                          "Study" = c(Developmental_Model_i2[3, 1], Developmental_Exposure_Model_i2[3, 1], Developmental_Amplitude_Model_i2[3, 1], Developmental_Fluctuation_Model_i2[3, 1], 
-                                                      Developmental_Trait_Model_i2[3, 1], Developmental_Specific_Trait_Model_i2[3, 1], Developmental_Class_Model_i2[3, 1]), 
-                                          "Total" = c(Developmental_Model_i2[1, 1], Developmental_Exposure_Model_i2[1, 1], Developmental_Amplitude_Model_i2[1, 1], Developmental_Fluctuation_Model_i2[1, 1], 
-                                                      Developmental_Trait_Model_i2[1, 1], Developmental_Specific_Trait_Model_i2[1, 1], Developmental_Class_Model_i2[1, 1]))
-
 write.csv(Heterogeneity_Overall, file = "./Complex_Heterogeneity_Overall.csv", row.names = FALSE)
-write.csv(Heterogeneity_Individual, file = "./Complex_Heterogeneity_Individual.csv", row.names = FALSE)
-write.csv(Heterogeneity_Aquatic, file = "./Complex_Heterogeneity_Aquatic.csv", row.names = FALSE)
-write.csv(Heterogeneity_Terrestrial, file = "./Complex_Heterogeneity_Terrestrial.csv", row.names = FALSE)
-write.csv(Heterogeneity_Acclimation, file = "./Complex_Heterogeneity_Acclimation.csv", row.names = FALSE)
-write.csv(Heterogeneity_Developmental, file = "./Complex_Heterogeneity_Developmental.csv", row.names = FALSE)

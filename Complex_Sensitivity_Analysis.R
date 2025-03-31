@@ -22,15 +22,28 @@ A <- ape::vcv.phylo(phy)
 row.names(A) <- colnames(A) <- row.names(A)
 A_cor <- ape::vcv.phylo(phy, corr = TRUE)
 
-# Variance Matrix (Shared Control)
-VCV <- make_VCV_matrix(data, V = "v_InRR", cluster = "Shared_Control_Number")
+#### Calculate Effect sizes #####
 
-VCV_Untransformed <- make_VCV_matrix(data, V = "v_InRR_Untransformed", cluster = "Shared_Control_Number")
+data <- data  %>% 
+  mutate(PRRD = PRRD(t1 = T1_constant, t2 = T2_constant, 
+                     t1_c = Mean_T1_C_Add, t2_c = Mean_T2_C_Add, t1_f = Mean_T1_F_Add, t2_f = Mean_T2_F_Add, 
+                     sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
+                     n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'ef'),
+         v_PRRD = PRRD(t1 = T1_constant, t2 = T2_constant, 
+                       t1_c = Mean_T1_C_Add, t2_c = Mean_T2_C_Add, t1_f = Mean_T1_F_Add, t2_f = Mean_T2_F_Add, 
+                       sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
+                       n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'v'))
+
+
+# Variance Matrix (Shared Control)
+VCV <- make_VCV_matrix(data, V = "v_PRRD", cluster = "Shared_Control_Number")
+
+#VCV_Untransformed <- make_VCV_matrix(data, V = "v_InRR_Untransformed", cluster = "Shared_Control_Number")
 
 ##### Publication Bias #####
 
 # Model of the Residuals from the Overall Model. 
-Model <- readRDS("./Complex_Overall_Model.rds")
+Model <- readRDS("./output/models/Complex_Overall_Model.rds")
 Residuals <- rstandard(Model)
 Residuals[c("slab", "digits")] = NULL
 Residuals_df <- do.call("rbind", Residuals)
@@ -46,8 +59,8 @@ Graph_Data <- Graph_Data %>% mutate(n_category = ifelse(n_T1_C <= 25, "25",
                                                  ifelse(n_T1_C > 50 & n_T1_C <= 75, "75", "> 75"))))
 
 
-Publication_Graph <- ggplot(Graph_Data, aes(x = Year, y = InRR_Transformed)) + 
-                     geom_point(aes(x = Year, y = InRR_Transformed, 
+Publication_Graph <- ggplot(Graph_Data, aes(x = Year, y = PRRD)) + 
+                     geom_point(aes(x = Year, y = PRRD, 
                                     size = fct_relevel(n_category, c("25", "50", "75", "> 75"))), 
                                 shape = 21, fill = "#4292c6", alpha = 0.5) + 
                      labs(x = "Publication Year", y = expression("Effect Size (PRRD"["S"]*")"), 
