@@ -400,7 +400,7 @@
         
         
         
-##### Overall Model - Invert/Vert Meta-Regression #####
+##### Overall Model - Invertebrate/Vertebrate Meta-Regression #####
         
         # Lets have a look at data in each category
         vert_invert_Exploration <- data %>% select("vert_invert") %>% table() %>% data.frame()
