@@ -1,4 +1,4 @@
-#####--Setup----------------------------#####
+##### Setup #####
   # Clean working space and load packages
     rm(list = ls())
     if (!require("pacman")) install.packages("pacman")
@@ -62,9 +62,6 @@ system.time(
 
 Overall_Model_rob <- robust(Overall_Model, cluster = data$Study_ID, adjust = TRUE)
 predict(Overall_Model_rob, transf=transf.exp.int)
-
-# Funnel plot
-funnel(x=residuals(Overall_Model_rob), vi = data$v_PRRD, yaxis="seinv", ylab = "Inverse Standard Error (1/SE)", xlab = "Meta-analytic Residuals")
 
 Overall_Model_Estimates <- data.frame(estimate = Overall_Model$b, 
                                          ci.lb = Overall_Model$ci.lb, 
@@ -822,6 +819,8 @@ individual_fluctuation_raw_name <- c(replicate(74, "Sinusoidal (Sine Curve)"),
 individual_fluctuation_raw_df <- data.frame("Model" = individual_fluctuation_raw_name, 
                                             "Effect" = individual_fluctuation_raw_mean)
 
+
+# REMOVE SUBSET ANALYSES BELOW. THIS IS ALL REDNDANT TO META_REGRESSION MODELS
 ##### Aquatic Subset Model #####
 Aquatic_Subset_Data <- Individual_Subset_Data %>% filter(Ecosystem == "Aquatic")
 Aquatic_Species <- Aquatic_Subset_Data %>% select("phylo") %>% unique()
