@@ -67,3 +67,37 @@ PRRD <- function(t1, t2, t1_c, t2_c, t1_f, t2_f, sd_t1_c, sd_t2_c, sd_t1_f, sd_t
     return(v_prrd)
   }
 }
+
+round_df <- function(df, digits = 2) {
+  df[] <- lapply(df, function(col) {
+    if (is.numeric(col)) round(col, digits) else col
+  })
+  return(df)
+}
+
+
+# Build table with results for supp
+table_results <- function(model, group = NULL, study_name = "Study_ID", species_name = "Scientific_Name"){
+  
+  dat = model$data
+  
+  if(is.null(group)){
+    tab <- dat %>% summarise(study = length(unique(!!sym(study_name))),
+                             species = length(unique(!!sym(species_name))),
+                             k = n())
+  } else {
+    tab <- dat %>% group_by(!!sym(group)) %>% summarise(study = length(unique(!!sym(study_name))),
+                                                     species = length(unique(!!sym(species_name))),
+                                                     k = n())
+  }
+  
+  modelvals <- round_df(data.frame(
+    "Estimate" = as.vector(model$b),
+    "CI Low" = as.vector(model$ci.lb), 
+    "CI High" = as.vector(model$ci.ub), 
+    "df" = as.vector(model$ddf), 
+    "p-value" = as.vector(model$pval), 
+    check.names = FALSE, row.names = NULL), 3)
+  
+  return(cbind(tab, modelvals))
+}
