@@ -34,6 +34,9 @@ data <- data  %>%
                        sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
                        n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'v'))
 
+# Check data with extreme precision. Mix up of SD/SE?
+  checks <- data %>% filter(1/sqrt(v_PRRD) > 100)
+  write.csv(checks, file = "checks.csv")
 
 # Variance Matrix (Shared Control)
 VCV <- make_VCV_matrix(data, V = "v_PRRD", cluster = "Shared_Control_Number")
@@ -56,7 +59,7 @@ Residuals_Model <- rma(yi = yi, vi = vi, data = Residuals_df2)
 Graph_Data <- data
 Graph_Data <- Graph_Data %>% mutate(n_category = ifelse(n_T1_C <= 25, "25", 
                                                  ifelse(n_T1_C > 25 & n_T1_C <= 50, "50", 
-                                                 ifelse(n_T1_C > 50 & n_T1_C <= 75, "75", "> 75"))))
+                                                 ifelse(n_T1_C > 50 & n_T1_C <= 75, "75", "> 75")))) %>% filter(!1/sqrt(v_PRRD) > 100)
 
 
 Publication_Graph <- ggplot(Graph_Data, aes(x = Year, y = PRRD)) + 
@@ -85,28 +88,21 @@ Funnel_Plot <- funnel(Residuals_Model, yaxis = "seinv",
                       pch = 21, back = "#D3DDEB", bg = "#183357")
 box(lwd = 2)
 
-# Trim and Fill
-Trim_Fill <- trimfill(Residuals_Model, estimator = "R0")
-Trim_Fill_Plot <- funnel(Trim_Fill, yaxis = "seinv", ylab = "",
-                         xlab = "Observed Outcome Residuals", pch = 21, back = "#D3DDEB", bg = "#183357")
-box(lwd = 2)
-
-plot(NULL ,xaxt='n',yaxt='n',bty='n',ylab='',xlab='', xlim=0:1, ylim=0:1)
-legend("top", legend = c("0.05 < p ≤ 1.00", "0 < p ≤ 0.05", "Studies", "Filled Studies"), 
-       pch = c(22, 22, 21, 21), pt.bg = c("#FFFFFF","#D3DDEB", "#183357", "#FFFFFF"), box.lwd = 2)
-
-# Egger's Regression Test (< 0.05 publication might be present)
-Eggers_Test <- regtest(Residuals_Model, model = "lm")
-
 # Time-lag Bias
 run <- TRUE
+
+# Variance Matrix (Shared Control)
+VCV <- make_VCV_matrix(Graph_Data, V = "v_PRRD", cluster = "Shared_Control_Number")
+
+Graph_Data$Precision <- 1/sqrt(Graph_Data$v_PRRD) # 1/SE
+
 system.time(
   if(run){
-    TL_Model <- metafor::rma.mv(InRR_Transformed, V = VCV, test = "t", dfs = "contain",
-                                mods = ~ Year_Z + Precision - 1,
+    TL_Model <- metafor::rma.mv(PRRD, V = VCV, test = "t", dfs = "contain",
+                                mods = ~ Year_Z + Precision,
                                 random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                               ~1|Shared_Animal_Number, ~1|Measurement), 
-                                R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
+                                R = list(phylo=A_cor), data = Graph_Data, method = "REML", sparse = TRUE, 
                                 control=list(rel.tol=1e-9))
     saveRDS(TL_Model, "./Complex_TL_Model.rds")
   } else {
@@ -117,7 +113,7 @@ system.time(
 run <- TRUE
 system.time(
   if(run){
-    Cooks_Overall_Model <- metafor::rma.mv(InRR_Transformed ~ 1, V = v_InRR, test = "t", dfs = "contain",
+    Cooks_Overall_Model <- metafor::rma.mv(PRRD ~ 1, V = v_PRRD, test = "t", dfs = "contain",
                                      random = list(~1|phylo, ~1|Study_ID, ~1|obs, ~1|Scientific_Name, 
                                                    ~1|Shared_Animal_Number, ~1|Measurement), 
                                      R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
