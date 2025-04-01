@@ -24,12 +24,12 @@
         
         data <- data  %>% 
           mutate(PRRD = PRRD(t1 = T1_constant, t2 = T2_constant, 
-                             t1_c = Mean_T1_C_Add, t2_c = Mean_T2_C_Add, t1_f = Mean_T1_F_Add, t2_f = Mean_T2_F_Add, 
-                             sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
+                             t1_c = Mean_Transformed_T1_C, t2_c = Mean_Transformed_T2_C, t1_f = Mean_Transformed_T1_F, t2_f = Mean_Transformed_T2_F, 
+                             sd_t1_c = SD_Final_Transformed_T1_C, sd_t2_c= SD_Final_Transformed_T2_C , sd_t1_f = SD_Final_Transformed_T1_F, sd_t2_f = SD_Final_Transformed_T2_F, 
                              n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'ef'),
                  v_PRRD = PRRD(t1 = T1_constant, t2 = T2_constant, 
-                               t1_c = Mean_T1_C_Add, t2_c = Mean_T2_C_Add, t1_f = Mean_T1_F_Add, t2_f = Mean_T2_F_Add, 
-                               sd_t1_c = SD_Final_T1_C_Add, sd_t2_c= SD_Final_T2_C_Add, sd_t1_f = SD_Final_T1_F_Add, sd_t2_f = SD_Final_T2_F_Add, 
+                               t1_c = Mean_Transformed_T1_C, t2_c = Mean_Transformed_T2_C, t1_f = Mean_Transformed_T1_F, t2_f = Mean_Transformed_T2_F, 
+                               sd_t1_c = SD_Final_Transformed_T1_C, sd_t2_c=  SD_Final_Transformed_T2_C, sd_t1_f = SD_Final_Transformed_T1_F, sd_t2_f = SD_Final_Transformed_T2_F, 
                                n_t1_c =  n_T1_C, n_t2_c = n_T2_C, n_t1_f = n_T1_F, n_t2_f = n_T2_F, type = 'v'))
 
 # Phylogenetic covariance matrix
@@ -117,6 +117,15 @@
                                                  ci.ub = Individual_Model$ci.ub)
 
 ##### Figure 2 #####
+        my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
+                                                             axis.text.x = element_text(margin = margin(b = 5), size = 16), 
+                                                             axis.ticks = element_blank(),
+                                                             axis.title = element_text(size = 18),
+                                                             legend.title = element_text(size = 16),
+                                                             legend.text = element_text(size = 16), 
+                                                             legend.position = "top",
+                                                             plot.tag = element_text(size = 16, face = "italic")))
+        }
         
         density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
           annotate('text',  x =1+0.1, y = 0.18,
@@ -643,16 +652,7 @@
       fluctuation_raw_df <- data.frame("Model" = fluctuation_raw_name, 
                                        "Effect" = fluctuation_raw_mean)
       
-      my_theme <- function() {list( theme_classic() ,theme(axis.text.y = element_text(size = 16), 
-                                                           axis.text.x = element_text(margin = margin(b = 5), size = 16), 
-                                                           axis.ticks = element_blank(),
-                                                           axis.title = element_text(size = 18),
-                                                           legend.title = element_text(size = 16),
-                                                           legend.text = element_text(size = 16), 
-                                                           legend.position = "top",
-                                                           plot.tag = element_text(size = 16, face = "italic")))
-      }
-      
+    
       density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
         my_theme() + 
         annotate('text',  x = c(1,2,3)+0.1, y = 0.18,
