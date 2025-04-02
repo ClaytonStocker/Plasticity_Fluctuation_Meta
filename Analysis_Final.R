@@ -946,7 +946,18 @@
                   Raw_Individual <- table_results(Individual_Model, study_name = "Study_ID", species_name = "Scientific_Name")
         Raw_Individual_Amplitude <- table_results(Individual_Amplitude_Model,  study_name = "Study_ID", species_name = "Scientific_Name") # Note intercept and slope (row 2)
  Raw_Individual_Fluctuation_Type <- table_results(Individual_Fluctuation_Model, group = "Fluctuation_Category", study_name = "Study_ID", species_name = "Scientific_Name")
-     
-    # Heterogeneity Table
-      write.csv(Overall_Model_i2, file = "./Complex_Heterogeneity_Overall.csv", row.names = FALSE)
+ 
+ # Write tables for supp
+  write.csv(Raw_Overall, file = "./output/tables/Raw_Overall.csv")
+  write.csv(Raw_Trait, file = "./output/tables/Raw_Trait")
+  write.csv(Raw_Specific_Trait, file = "./output/tables/Raw_Specific_Trait")
+  write.csv(Raw_Vert_Invert, file = "./output/tables/Raw_Vert_Invert")
+  write.csv(Raw_Habitat, file = "./output/tables/Raw_Habitat")
+  write.csv(Raw_Amplitude, file = "./output/tables/Raw_Amplitude")
+  write.csv(Raw_Fluctuation_Type, file = "./output/tables/Raw_Fluctuation_Type")
+  write.csv(Raw_Individual, file = "./output/tables/Raw_Individual")
+  write.csv(Raw_Individual_Fluctuation_Type, file = "./output/tables/Raw_Individual_Fluctuation_Type")
+  
+ # Heterogeneity Table
+      write.csv(Overall_Model_i2, file = "./output/tables/Complex_Heterogeneity_Overall.csv", row.names = FALSE)
       
