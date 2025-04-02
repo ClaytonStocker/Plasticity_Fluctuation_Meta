@@ -1,0 +1,5 @@
+"","Trait_Category","study","species","k","Estimate","CI Low","CI High","df","p-value"
+"1","Biochemical Assay",4,4,32,0.001,-0.032,0.034,191,0.939
+"2","Life-History Traits",28,30,68,0.013,-0.004,0.03,191,0.138
+"3","Morphology",20,23,54,-0.001,-0.017,0.015,191,0.913
+"4","Physiological",14,12,41,-0.002,-0.024,0.019,191,0.834
