@@ -6,6 +6,10 @@ Clayton W. Stocker, Daniel W.A. Noble, Frank Seebacher. (2025) Temperature varia
 
 Please email clayton.stocker@sydney.edu.au for any inquiries. 
 
+## Analyses
+
+All code for analyses reproducing the results and figures is found in `Analysis_Final.R` script. The code also generates supplementary tables and results.
+
 ## Data
 The data is the `Complex_Final_Data.csv` file. This file contains the data used in the meta-analysis. The meta-data that describes the columns are as follows:
 
