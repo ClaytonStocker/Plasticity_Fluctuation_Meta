@@ -913,7 +913,34 @@
       fig7 <- (Amplitude_Plot + t() | Individual_Amplitude_Plot + t()) + plot_annotation(tag_levels = "a", tag_suffix = ")")
       ggsave(fig7, filename= "./output/figs/fig7.png", height = 5, width = 10)
       
-##### Supplementary Material Tables #####
+##### Individual-Level Subset Model - Invertebrate/Vertebrate Meta-Regression
+      # Fit model
+      run <- TRUE
+      system.time(
+        if(run){
+          Individual_Taxa <- metafor::rma.mv(PRRD ~ vert_invert-1, V = Individual_VCV, test = "t", 
+                                              random = list(~1|phylo, 
+                                                            ~1|Study_ID, 
+                                                            ~1|obs, 
+                                                            ~1|Scientific_Name, 
+                                                            ~1|Shared_Animal_Number, 
+                                                            ~1|Measurement), 
+                                              R = list(phylo=Individual_A_cor), data = Individual_Subset_Data, method = "REML", sparse = TRUE,
+                                              control=list(rel.tol=1e-9))
+          saveRDS(Individual_Taxa, "./output/models/Complex_Individual_Taxa.rds")
+        } else {
+          Individual_Taxa <- readRDS("./output/models/Complex_Individual_Taxa.rds")
+        })
+      
+      # Check robustness
+      Individual_Taxa_rob <- robust(Individual_Taxa, cluster = Individual_Subset_Data$Study_ID, adjust = TRUE)
+      
+      # Extract estimates
+      Individual_Taxa_Estimates <- data.frame(estimate = Individual_Taxa$b, 
+                                               ci.lb = Individual_Taxa$ci.lb, 
+                                               ci.ub = Individual_Taxa$ci.ub)
+      
+##### Supplementary Material Results #####
       
   # Phylogenetic Tree with labels
 
@@ -946,17 +973,31 @@
                   Raw_Individual <- table_results(Individual_Model, study_name = "Study_ID", species_name = "Scientific_Name")
         Raw_Individual_Amplitude <- table_results(Individual_Amplitude_Model,  study_name = "Study_ID", species_name = "Scientific_Name") # Note intercept and slope (row 2)
  Raw_Individual_Fluctuation_Type <- table_results(Individual_Fluctuation_Model, group = "Fluctuation_Category", study_name = "Study_ID", species_name = "Scientific_Name")
+ Raw_Individual_Taxa <- table_results(Individual_Taxa, group = "vert_invert", study_name = "Study_ID", species_name = "Scientific_Name")
+ 
+ # Publication bias
+
+ # Calculate influence diagnostics. Takes a long time so avoid re-running.
+ rerun = FALSE
+ if(rerun){
+   inf <- cooks.distance(Overall_Model)
+   saveRDS(inf,"./output/models/inf.rds")
+ } else {
+   inf <- readRDS("./output/models/inf.rds")
+ }
  
  # Write tables for supp
   write.csv(Raw_Overall, file = "./output/tables/Raw_Overall.csv")
-  write.csv(Raw_Trait, file = "./output/tables/Raw_Trait")
-  write.csv(Raw_Specific_Trait, file = "./output/tables/Raw_Specific_Trait")
-  write.csv(Raw_Vert_Invert, file = "./output/tables/Raw_Vert_Invert")
-  write.csv(Raw_Habitat, file = "./output/tables/Raw_Habitat")
-  write.csv(Raw_Amplitude, file = "./output/tables/Raw_Amplitude")
-  write.csv(Raw_Fluctuation_Type, file = "./output/tables/Raw_Fluctuation_Type")
-  write.csv(Raw_Individual, file = "./output/tables/Raw_Individual")
-  write.csv(Raw_Individual_Fluctuation_Type, file = "./output/tables/Raw_Individual_Fluctuation_Type")
+  write.csv(Raw_Trait, file = "./output/tables/Raw_Trait.csv")
+  write.csv(Raw_Specific_Trait, file = "./output/tables/Raw_Specific_Trait.csv")
+  write.csv(Raw_Vert_Invert, file = "./output/tables/Raw_Vert_Invert.csv")
+  write.csv(Raw_Habitat, file = "./output/tables/Raw_Habitat.csv")
+  write.csv(Raw_Amplitude, file = "./output/tables/Raw_Amplitude.csv")
+  write.csv(Raw_Fluctuation_Type, file = "./output/tables/Raw_Fluctuation_Type.csv")
+  write.csv(Raw_Individual, file = "./output/tables/Raw_Individual.csv")
+  write.csv(Raw_Individual_Fluctuation_Type, file = "./output/tables/Raw_Individual_Fluctuation_Type.csv")
+  write.csv(Raw_Individual_Amplitude, file = "./output/tables/Raw_Individual_Amplitude.csv")
+  write.csv(Raw_Individual_Taxa, file = "./output/tables/Raw_Individual_Taxa.csv")
   
  # Heterogeneity Table
       write.csv(Overall_Model_i2, file = "./output/tables/Complex_Heterogeneity_Overall.csv", row.names = FALSE)
