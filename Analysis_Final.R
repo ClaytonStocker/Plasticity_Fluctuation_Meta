@@ -126,15 +126,16 @@
                                                              legend.position = "top",
                                                              plot.tag = element_text(size = 16, face = "italic")))
         }
-        
-        density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
+  
+        trunk.size = 1
+        density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size) + ylim(-0.2, 0.2) + my_theme() + 
           annotate('text',  x =1+0.1, y = 0.18,
                    label= paste("italic(k)==", dim(data)[1], "~","(", length(unique(data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label= paste(format(round(mean(exp(Overall_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
                    x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "Overall")) 
         
         
-        indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + my_theme() + 
+        indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size) + ylim(-0.2, 0.2) + my_theme() + 
           annotate('text',  x =1+0.1, y = 0.18,
                    label= paste("italic(k)==", dim(Individual_Subset_Data)[1], "~","(", length(unique(Individual_Subset_Data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label= paste(format(round(mean(exp(Individual_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
@@ -144,7 +145,7 @@
         position = "topleft"
         fig2 <- (density_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))  | indivdual_orchard_overall + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) ) + plot_annotation(tag_levels = "a", tag_suffix = ")")
         
-        ggsave(filename = "./output/figs/fig2.png", , width = 11.2, height =  5.8)
+        ggsave(filename = "./output/figs/fig2.png", , width = 12, height =  5.8)
         
 ##### Overall Model - Trait Meta-Regression #####
         
@@ -976,7 +977,25 @@
  Raw_Individual_Taxa <- table_results(Individual_Taxa, group = "vert_invert", study_name = "Study_ID", species_name = "Scientific_Name")
  
  # Publication bias
-
+  data$Precision <- 1/sqrt(data$v_PRRD)
+ 
+  if(rerun){
+    Overall_PubBias <- metafor::rma.mv(PRRD ~ 1 + Year_Z + Precision, V = VCV, test = "t", 
+                                     random = list(~1|phylo, 
+                                                   ~1|Study_ID, 
+                                                   ~1|obs, 
+                                                   ~1|Scientific_Name, 
+                                                   ~1|Shared_Animal_Number, 
+                                                   ~1|Measurement), 
+                                     R = list(phylo=A_cor), data = data, method = "REML", sparse = TRUE, 
+                                     control=list(rel.tol=1e-9))
+      saveRDS(Overall_PubBias, "./output/models/Overall_PubBias")
+  } else {
+    Overall_PubBias <- readRDS("./output/models/Overall_PubBias")
+  }
+  
+  bubble_plot(Overall_PubBias, mod = "Year_Z", group = "Study_ID", ylab = "PRRDs", xlab = "Publication Year (scaled)")
+  
  # Calculate influence diagnostics. Takes a long time so avoid re-running.
  rerun = FALSE
  if(rerun){
@@ -985,6 +1004,32 @@
  } else {
    inf <- readRDS("./output/models/inf.rds")
  }
+ 
+ # Check if there are influential (CD => 1). Appears to be one effect that is problematic. 
+    plot(inf, type = "o", ylab = "Cook's Distance", xlab = "Effect")
+    which(inf >=0.8) # row 119 appears potentially problematic. 
+    
+ # Refit model without this outlier, do we get different results? Answer is generally, no
+    run <- TRUE
+    system.time(
+      if(run){
+        data2 <- data[-119,]
+        VCV2 <- VCV[-119, -119]
+        
+        Overall_Model_outlier <- metafor::rma.mv(PRRD ~ 1, V = VCV2, test = "t", 
+                                         random = list(~1|phylo, 
+                                                       ~1|Study_ID, 
+                                                       ~1|obs, 
+                                                       ~1|Scientific_Name, 
+                                                       ~1|Shared_Animal_Number, 
+                                                       ~1|Measurement), 
+                                         R = list(phylo=A_cor), data = data2, method = "REML", sparse = TRUE, 
+                                         control=list(rel.tol=1e-9))
+        saveRDS(Overall_Model_outlier, "./output/models/Complex_Overall_Model_outlier.rds")
+      } else {
+        Overall_Model_outlier <- readRDS("./output/models/Complex_Overall_Model_outlier.rds")
+      })
+    
  
  # Write tables for supp
   write.csv(Raw_Overall, file = "./output/tables/Raw_Overall.csv")
