@@ -1,0 +1,3 @@
+"","vert_invert","study","species","k","Estimate","CI Low","CI High","df","p-value"
+"1","Invertebrate",36,32,156,0.003,-0.014,0.019,201,0.761
+"2","Vertebrate",7,8,47,-0.002,-0.029,0.024,201,0.861
