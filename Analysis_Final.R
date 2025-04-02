@@ -9,7 +9,7 @@
                  tidyr, ggplot2, rotl, DescTools, stringr, ape, 
                  emmeans, patchwork, latex2exp, metafor, brms, 
                  flextable, phytools, MCMCglmm, metaAidR, orchaRd, 
-                 robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor)
+                 robumeta, ggpmisc, ggridges, ggbeeswarm, gridExtra, janitor, rphylopic)
   
   source("func.R")
 
@@ -121,25 +121,25 @@
                                                              axis.text.x = element_text(margin = margin(b = 5), size = 16), 
                                                              axis.ticks = element_blank(),
                                                              axis.title = element_text(size = 18),
-                                                             legend.title = element_text(size = 16),
-                                                             legend.text = element_text(size = 16), 
+                                                             legend.title = element_text(size = 15),
+                                                             legend.text = element_text(size = 15), 
                                                              legend.position = "top",
                                                              plot.tag = element_text(size = 16, face = "italic")))
         }
   
         trunk.size = 1
-        density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size) + ylim(-0.2, 0.2) + my_theme() + 
+        density_orchard_overall <- orchard_plot(Overall_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size) + ylim(-0.18, 0.18) + my_theme() + 
           annotate('text',  x =1+0.1, y = 0.18,
                    label= paste("italic(k)==", dim(data)[1], "~","(", length(unique(data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label= paste(format(round(mean(exp(Overall_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                   x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "Overall")) 
+                   x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "Overall")) + scale_fill_manual(values = "gray") +  scale_colour_manual(values = "black")
         
         
-        indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size) + ylim(-0.2, 0.2) + my_theme() + 
+        indivdual_orchard_overall <- orchard_plot(Individual_Model, group = "Study_ID", mod = "1", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size) + ylim(-0.18, 0.18) + my_theme() + 
           annotate('text',  x =1+0.1, y = 0.18,
                    label= paste("italic(k)==", dim(Individual_Subset_Data)[1], "~","(", length(unique(Individual_Subset_Data$Study_ID)), ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label= paste(format(round(mean(exp(Individual_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"),
-                   x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "")) 
+                   x = 1+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Intrcpt" = "")) + scale_fill_manual(values = "gray") + scale_colour_manual(values = "black")
         
         size = 24
         position = "topleft"
@@ -366,9 +366,12 @@
         
         specific_trait_raw_df <- data.frame("Model" = specific_trait_raw_name, 
                                             "Effect" = specific_trait_raw_mean)
-        density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
+        
+        trunk.size = 1
+        branch.size = 1.5
+        density_trait_orchard <- orchard_plot(Trait_Model, group = "Study_ID", mod = "Trait_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.18, 0.18) + 
           my_theme() + 
-          annotate('text',  x = c(1,2,3,4)+0.1, y = 0.18, label = 
+          annotate('text',  x = c(1,2,3,4)+0.25, y = 0.18, label = 
                      paste("italic(k)==", c(trait_table["Biochemical Assay", "K"], 
                                             trait_table["Life-history Traits", "K"],
                                             trait_table["Morphological", "K"],
@@ -382,12 +385,12 @@
             paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"),
             paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"),
             paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-            x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+            x = c(1,2,3,4)+0.25, y = -0.10, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
         
         
-        density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.25, 0.25) + 
+        density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.12, 0.12) + 
           my_theme() + 
-          annotate('text',  x = c(1,2,3,4)+0.1, y = 0.22, label= paste("italic(k)==", c(specific_trait_table["Development Time", "K"],
+          annotate('text',  x = c(1,2,3,4)+0.25, y = 0.12, label= paste("italic(k)==", c(specific_trait_table["Development Time", "K"],
                                                                                         specific_trait_table["Length", "K"],
                                                                                         specific_trait_table["Mass", "K"],
                                                                                         specific_trait_table["Metabolic Rate", "K"]), "~","(", 
@@ -399,15 +402,13 @@
           annotate('text', label=c(paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Development Time", "estimate"])-1)*100, 2), nsmall = 2), "%"), paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Length", "estimate"])-1)*100, 2), nsmall = 2), "%"),
                                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Mass", "estimate"])-1)*100, 2), nsmall = 2), "%"),
                                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Metabolic Rate", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                   x = c(1,2,3,4)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+                   x = c(1,2,3,4)+0.25, y = -0.08, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + annotate('text',  x = c(1,3)+0.25, y = -0.025, label = "*", size = 10)
         
         size = 24
         position = "topleft"
         fig3 <- (density_trait_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_specific_trait_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
         
-        ggsave(filename = "./output/figs/fig3.png", fig3, width = 13.7125, height =  7.4125)
-        
-        
+        ggsave(filename = "./output/figs/fig3.png", fig3, width = 15, height =  7.4125)
         
         
 ##### Overall Model - Invertebrate/Vertebrate Meta-Regression #####
@@ -483,8 +484,22 @@
         
         habitat_table <- data  %>% group_by(Ecosystem) %>% summarise(group_no = n_distinct(Study_ID), spp = n_distinct(phylo), k = n()) %>% cbind(habitat_Model_Estimates[,-1])
         
+        trunk.size = 1
+        branch.size = 1.5
+        col <- c("#0871B9", "#1BB908")
         
-        density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
+        # Get a single image UUID for a species
+        uuid_terrs <- get_uuid(name = "Anolis_sagrei")
+        # Get the image for that UUID
+        terrest <- get_phylopic(uuid = uuid_terrs)
+        
+        # Get a single image UUID for a species
+        uuid_aq <- get_uuid(name = "Oryzias_latipes")
+        # Get the image for that UUID
+        aq <- get_phylopic(uuid = uuid_aq)
+        
+        
+        density_habitat_orchard <- orchard_plot(habitat_Model, group = "Study_ID", mod = "Ecosystem", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.2, 0.2) + 
           my_theme() + 
           annotate('text',  x = c(1,2)+0.1, y = 0.18, 
                    label= paste("italic(k)==", 
@@ -495,10 +510,22 @@
                                 ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label=c(paste(format(round(mean(exp(habitat_table[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
                                    paste(format(round(mean(exp(habitat_table[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                   x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+                   x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_fill_manual(values = col)  +  scale_colour_manual(values = c("black", "black")) + add_phylopic(img = terrest, x = 2.4, y = -0.15, height = 0.35) + add_phylopic(img = aq, x = 1.4, y = -0.15, height = 0.15)
         
         
-        density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
+        # Get a single image UUID for a species
+        uuid_inv <- get_uuid(name = "Aedes_aegypti")
+        # Get the image for that UUID
+        invert <- get_phylopic(uuid = uuid_inv)
+        
+        # Get a single image UUID for a species
+        uuid_vert <- get_uuid(name = "Chrysemys_picta")
+        # Get the image for that UUID
+        vert <- get_phylopic(uuid = uuid_vert)
+        vert <- rotate_phylopic(img = vert, angle = 45)
+        
+        
+        density_vert_invert_orchard <- orchard_plot(vert_invert_Model, group = "Study_ID", mod = "vert_invert", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.2, 0.2) + 
           my_theme() + 
           annotate('text',  x = c(1,2)+0.1, y = 0.18, 
                    label= paste("italic(k)==", 
@@ -509,13 +536,13 @@
                                 ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label=c(paste(format(round(mean(exp(vert_invert_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
                                    paste(format(round(mean(exp(vert_invert_Model_Estimates[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                   x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+                   x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + add_phylopic(img = vert, x = 2.4, y = -0.15, height = 0.30) + add_phylopic(img = invert, x = 1.4, y = -0.15, height = 0.25)
         
         size = 24
         position = "topleft"
         fig4 <- (density_habitat_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic")) | density_vert_invert_orchard + theme(plot.tag.position = position, plot.tag = element_text(size = size, face = "italic"))) + plot_annotation(tag_levels = "a", tag_suffix = ")") 
         
-        ggsave(filename = "./output/figs/fig4.png", fig4, width = 11.9125, height =  8.049383)
+        ggsave(filename = "./output/figs/fig4.png", fig4, width =14, height =  6)
         
         
         
