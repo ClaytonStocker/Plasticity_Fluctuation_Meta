@@ -385,7 +385,7 @@
             paste(format(round(mean(exp(Trait_Model_Estimates["Life-History Traits", "estimate"])-1)*100, 2), nsmall = 2), "%"),
             paste(format(round(mean(exp(Trait_Model_Estimates["Morphology", "estimate"])-1)*100, 2), nsmall = 2), "%"),
             paste(format(round(mean(exp(Trait_Model_Estimates["Physiological", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-            x = c(1,2,3,4)+0.25, y = -0.10, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+            x = c(1,2,3,4)+0.25, y = -0.10, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") +  scale_colour_manual(values = c("black", "black", "black", "black"))
         
         
         density_specific_trait_orchard <- orchard_plot(Specific_Trait_Model, group = "Study_ID", mod = "Measurement", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.12, 0.12) + 
@@ -402,7 +402,7 @@
           annotate('text', label=c(paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Development Time", "estimate"])-1)*100, 2), nsmall = 2), "%"), paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Length", "estimate"])-1)*100, 2), nsmall = 2), "%"),
                                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Mass", "estimate"])-1)*100, 2), nsmall = 2), "%"),
                                    paste(format(round(mean(exp(Specific_Trait_Model_Estimates["Metabolic Rate", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                   x = c(1,2,3,4)+0.25, y = -0.08, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + annotate('text',  x = c(1,3)+0.25, y = -0.025, label = "*", size = 10)
+                   x = c(1,2,3,4)+0.25, y = -0.08, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + annotate('text',  x = c(1,3)+0.25, y = -0.025, label = "*", size = 10) +  scale_colour_manual(values = c("black", "black", "black", "black"))
         
         size = 24
         position = "topleft"
@@ -536,7 +536,7 @@
                                 ")"), parse = TRUE, hjust = "right", size = 6) +
           annotate('text', label=c(paste(format(round(mean(exp(vert_invert_Model_Estimates[1, "estimate"])-1)*100, 2), nsmall = 2), "%"), 
                                    paste(format(round(mean(exp(vert_invert_Model_Estimates[2, "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                   x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + add_phylopic(img = vert, x = 2.4, y = -0.15, height = 0.30) + add_phylopic(img = invert, x = 1.4, y = -0.15, height = 0.25)
+                   x = c(1,2)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + add_phylopic(img = vert, x = 2.4, y = -0.15, height = 0.45) + add_phylopic(img = invert, x = 1.4, y = -0.15, height = 0.25) +  scale_colour_manual(values = c("black", "black"))
         
         size = 24
         position = "topleft"
@@ -680,10 +680,11 @@
       fluctuation_raw_df <- data.frame("Model" = fluctuation_raw_name, 
                                        "Effect" = fluctuation_raw_mean)
       
-    
-      density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
+      trunk.size = 1
+      branch.size = 1.5
+      density_fluctuation_orchard <- orchard_plot(Fluctuation_Model, group = "Study_ID", mod = "Fluctuation_Category", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.18, 0.20)  + 
         my_theme() + 
-        annotate('text',  x = c(1,2,3)+0.1, y = 0.18,
+        annotate('text',  x = c(1,2,3)+0.25, y = 0.2,
                  label= paste("italic(k)==", c(fluctuation_table["Alternating", "K"],
                                                fluctuation_table["Sinusoidal (Sine Curve)", "K"], 
                                                fluctuation_table["Stepwise", "K"]), "~","(", 
@@ -694,7 +695,7 @@
         annotate('text', label=c(paste(format(round(mean(exp(Fluctuation_Model_Estimates["Alternating", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
                                  paste(format(round(mean(exp(Fluctuation_Model_Estimates["Sinusoidal (Sine Curve)", "estimate"])-1)*100, 2), nsmall = 2), "%"),
                                  paste(format(round(mean(exp(Fluctuation_Model_Estimates["Stepwise", "estimate"])-1)*100, 2), nsmall = 2), "%")), 
-                 x = c(1,2,3)+0.1, y = -0.15, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80")
+                 x = c(1,2,3)+0.25, y = -0.1, size = 6) + geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") +  scale_colour_manual(values = c("black", "black", "black"))
       
       ggsave(filename = "./output/figs/fig5.png", density_fluctuation_orchard, width = 8.185185, height =  6.975309)
       
@@ -750,19 +751,24 @@
       
 ##### Figure 6 #####
       
-      density_plasticiyMechanism_orchard <- orchard_plot(PlasticityMechanism_Model, group = "Study_ID", mod = "Plasticity_Mechanism", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = 2) + ylim(-0.2, 0.2) + 
+      plasticity_mechanism_dat <- plasticity_mec_data %>% group_by(Plasticity_Mechanism) %>% summarise(group_no = length(unique(Study_ID)), spp = length(unique(phylo)), k = n())  %>% cbind(PlasticityMechanism_Model_Estimates) 
+      rownames(plasticity_mechanism_dat) <- plasticity_mechanism_dat$Plasticity_Mechanism
+      
+      trunk.size = 1
+      branch.size = 1.5
+      density_plasticiyMechanism_orchard <- orchard_plot(PlasticityMechanism_Model, group = "Study_ID", mod = "Plasticity_Mechanism", xlab = TeX(" Effect Size ($PRRD_{S}$)"), angle = 45, k = FALSE, g = FALSE, trunk.size = trunk.size, branch.size = branch.size) + ylim(-0.18, 0.20) + 
         my_theme() + 
-        annotate('text',  x = c(1,2)+0.1, y = 0.18,
+        annotate('text',  x = c(1,2)+0.25, y = 0.20,
                  label= paste("italic(k)==", c(plasticity_mechanism_dat["Acclimation", "k"],
                                                plasticity_mechanism_dat["Developmental Plasticity", "k"]), "~","(", 
                               c(plasticity_mechanism_dat["Acclimation", "group_no"],
                                 plasticity_mechanism_dat["Developmental Plasticity", "group_no"]), ")"), parse = TRUE, hjust = "right", size = 6) +
         annotate('text', 
                  label=c(paste(format(round(mean(exp(plasticity_mechanism_dat["Acclimation", "estimate"])-1)*100, 2), nsmall = 2), "%"), 
-                         paste(format(round(mean(exp(plasticity_mechanism_dat["Developmental Plasticity", "estimate"])-1)*100, 2), nsmall = 2), "%")), x = c(1,2)+0.1, y = -0.15, size = 6) + 
-        geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Developmental Plasticity" = "Development"))
+                         paste(format(round(mean(exp(plasticity_mechanism_dat["Developmental Plasticity", "estimate"])-1)*100, 2), nsmall = 2), "%")), x = c(1,2)+0.25, y = -0.1, size = 6) + 
+        geom_hline(yintercept =  c(-0.2, -0.1, 0.1, 0.2), linetype = "dashed", colour = "gray80") + scale_x_discrete(labels = c("Developmental Plasticity" = "Development")) + scale_colour_manual(values = c("black", "black", "black")) + scale_fill_manual(values=c("#453781FF", "#287D8EFF"))
       
-      ggsave(filename = "./output/figs/fig6.png", density_plasticiyMechanism_orchard, width = 8.825, height =  7.200)
+      ggsave(filename = "./output/figs/fig6.png", density_plasticiyMechanism_orchard, width = 7, height =  5)
 
 ##### Individual-Level Subset Model - Fluctuation Amplitude Meta-Regression ####
       run <- TRUE
