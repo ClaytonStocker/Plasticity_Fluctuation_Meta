@@ -1078,5 +1078,5 @@
   write.csv(Raw_Individual_Taxa, file = "./output/tables/Raw_Individual_Taxa.csv")
   
  # Heterogeneity Table
-      write.csv(Overall_Model_i2, file = "./output/tables/Complex_Heterogeneity_Overall.csv", row.names = FALSE)
+      write.csv(t(Overall_Model_i2), file = "./output/tables/Complex_Heterogeneity_Overall.csv", row.names = FALSE)
       
